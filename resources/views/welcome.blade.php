@@ -73,7 +73,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                         <a href="https://laravel.com/docs" class="scale-100 p-6 bg-white rounded-lg shadow-none  flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                             <div>
-                                <div style="background-color:#f6b93b" class="h-16 w-16 flex items-center justify-center rounded-full">
+                                <div style="background-color:#1e3799" class="h-16 w-16 flex items-center justify-center rounded-full">
                                     <i class="fa-solid fa-palette" style="color:#fff;font-size:22px;"></i>
                                 </div>
 
@@ -91,7 +91,7 @@
 
                         <a href="https://laravel.com/docs" class="scale-100 p-6 bg-white rounded-lg shadow-none shadow-gray-500/20  flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                             <div>
-                                <div style="background-color:#f6b93b" class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full">
+                                <div style="background-color:#1e3799" class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full">
                                     <i class="fa-solid fa-star" style="color:#fff;font-size:22px;"></i>
                                 </div>
 
