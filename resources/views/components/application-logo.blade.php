@@ -28,4 +28,4 @@
 }
 
 </style>
-<a href="/" class="arvo-bold" style="font-size:22px;color:#b71540;">Create a Puzzle</a>
+<a href="/" class="arvo-bold" style="font-size:33px;color:#b71540;">Create a Puzzle</a>
