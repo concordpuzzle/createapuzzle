@@ -73,11 +73,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                         <a href="https://laravel.com/docs" class="scale-100 p-6 bg-white rounded-lg shadow-none  flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                             <div>
-                                <div style="background-color:#1e3799" class="h-16 w-16 flex items-center justify-center rounded-full">
-                                    <i class="fa-solid fa-palette" style="color:#fff;font-size:22px;"></i>
+                                <div style="background-color:#0c2461" class="h-16 w-16 flex items-center justify-center rounded-full">
+                                    <i class="fa-solid fa-camera-retro" style="color:#fff;font-size:22px;"></i>
                                 </div>
 
-                                <h2 class="mt-6 text-xl font-semibold text-gray-900">Create Puzzle Images with AI</h2>
+                                <h2 class="mt-6 text-xl font-semibold text-gray-900">Make a <u>Photo</u> Puzzle</h2>
 
                                 <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
                                     Laravel has wonderful documentation covering every aspect of the framework. Whether you are a newcomer or have prior experience with Laravel, we recommend reading our documentation from beginning to end.
@@ -91,11 +91,11 @@
 
                         <a href="https://laravel.com/docs" class="scale-100 p-6 bg-white rounded-lg shadow-none shadow-gray-500/20  flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                             <div>
-                                <div style="background-color:#1e3799" class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full">
-                                    <i class="fa-solid fa-heart" style="color:#fff;font-size:22px;"></i>
+                                <div style="background-color:#0c2461" class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full">
+                                    <i class="fa-solid fa-pencil" style="color:#fff;font-size:22px;"></i>
                                 </div>
 
-                                <h2 class="mt-6 text-xl font-semibold text-gray-900">Rate Puzzle Images</h2>
+                                <h2 class="mt-6 text-xl font-semibold text-gray-900">Make an <u>Illustration</u> Puzzle</h2>
 
                                 <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
                                     Laracasts offers thousands of video tutorials on Laravel, PHP, and JavaScript development. Check them out, see for yourself, and massively level up your development skills in the process.
@@ -109,12 +109,12 @@
 
                         <a href="https://laravel.com/docs" class="scale-100 p-6 bg-white rounded-lg shadow-none shadow-gray-500/20  flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                             <div>
-                                <div style="background-color:#1e3799" class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full">
-                                <i class="fa-solid fa-bag-shopping" style="color:#fff;font-size:22px;"></i>
+                                <div style="background-color:#0c2461" class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full">
+                                <i class="fa-solid fa-palette" style="color:#fff;font-size:22px;"></i>
 
                                 </div>
 
-                                <h2 class="mt-6 text-xl font-semibold text-gray-900">Shop Community Puzzles</h2>
+                                <h2 class="mt-6 text-xl font-semibold text-gray-900">Make a <u>Painting</u> Puzzle</h2>
 
                                 <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
                                     Laravel News is a community driven portal and newsletter aggregating all of the latest and most important news in the Laravel ecosystem, including new package releases and tutorials.
@@ -128,7 +128,7 @@
 
                         <div class="scale-100 p-6 bg-white rounded-lg shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                             <div>
-                                <img src="http://concordpuzzle.com/wp-content/uploads/2024/04/Greenfield-3.png" width="95px;"><br />
+                                <img src="https://concordpuzzle.com/wp-content/uploads/2024/06/Create-a-Puzzle-1.png" width="95px;"><br />
 
                                 <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">By Concord Puzzle</h2>
 
