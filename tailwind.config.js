@@ -17,8 +17,7 @@ export default {
         extend: {
             colors: {
                 // Define your custom colors here
-                brandcolor: '#0c2461',
-                secondary: colors.green,
+                brandRed: '#b71540',
                 // You can also define custom shades of colors
                 customGray: {
                     50: '#f9fafb',
