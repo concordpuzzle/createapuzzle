@@ -33,7 +33,7 @@
 
             <div class="max-w-7xl mx-auto p-6 lg:p-8">
                 <div class="flex justify-center">
-                     <img src="https://concordpuzzle.com/wp-content/uploads/2024/05/Greenfield-12-1.png" width="111px;">
+                     <img src="http://concordpuzzle.com/wp-content/uploads/2024/04/Greenfield-3.png" width="190px;">
                 </div>
 
                 <div class="mt-16">
