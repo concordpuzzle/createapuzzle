@@ -5,3 +5,15 @@
 [x-cloak] {
     display: none;
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Radio+Canada+Big:ital,wght@0,400..700;1,400..700&display=swap');
+
+// <uniquifier>: Use a unique and descriptive class name
+// <weight>: Use a value from 400 to 700
+
+.radio-canada-big-<uniquifier> {
+  font-family: "Radio Canada Big", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+}
