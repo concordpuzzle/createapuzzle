@@ -12,6 +12,8 @@ class CPImageGeneration extends Model
 {
     use HasFactory;
 
+    protected $table = 'c_p_image_generations'; // Explicitly set the table name
+
     protected $fillable = ['prompt', 'generated_image', 'midjourney_message_id'];
 }
 

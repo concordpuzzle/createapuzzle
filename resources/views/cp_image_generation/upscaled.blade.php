@@ -6,17 +6,30 @@
 
 <div class="container">
     <h1>Upscaled Image</h1>
-    @if(session('error'))
-        <div class="alert alert-danger">
-            {{ session('error') }}
+    <div class="card mb-4 shadow-sm">
+        <img src="{{ Storage::url($image->generated_image) }}" class="card-img-top" alt="{{ $image->prompt }}">
+        <div class="card-body">
+            <p class="card-text">{{ $image->prompt }}</p>
+            <button class="btn btn-primary" onclick="openCropModal('{{ Storage::url($image->generated_image) }}', '{{ $image->id }}')">Crop Image</button>
         </div>
-    @endif
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card mb-4 shadow-sm">
-                <img id="imageToCrop" src="{{ $imageUrl }}" class="card-img-top" alt="Upscaled Image">
-                <div class="card-body">
-                    <button class="btn btn-primary" onclick="cropImage()">Crop Image</button>
+    </div>
+
+    <!-- Crop Modal -->
+    <div id="cropModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Crop Image</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img id="imageToCrop" src="" style="max-width: 100%;">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="cropImage()">Crop</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -31,12 +44,22 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <script>
     let cropper;
-    $(document).ready(function() {
-        cropper = new Cropper(document.getElementById('imageToCrop'), {
-            aspectRatio: 16 / 9,  // Change to your desired ratio
-            viewMode: 1
+    let imageId;
+
+    function openCropModal(imageUrl, id) {
+        document.getElementById('imageToCrop').src = imageUrl;
+        imageId = id;
+        $('#cropModal').modal('show');
+        $('#cropModal').on('shown.bs.modal', function () {
+            cropper = new Cropper(document.getElementById('imageToCrop'), {
+                aspectRatio: 16 / 9,  // Change to your desired ratio
+                viewMode: 1
+            });
+        }).on('hidden.bs.modal', function () {
+            cropper.destroy();
+            cropper = null;
         });
-    });
+    }
 
     function cropImage() {
         const canvas = cropper.getCroppedCanvas();
