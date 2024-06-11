@@ -356,8 +356,8 @@ public function createProduct(Request $request)
 
 public function puzzleFeed()
 {
-    $publishedProducts = PublishedProduct::all();
-    return view('cp_image_generation.puzzle_feed', compact('publishedProducts'));
+    $publishedProducts = PublishedProduct::with('user')->get();
+    return view('puzzle_feed', compact('publishedProducts'));
 }
 
 

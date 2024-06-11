@@ -14,6 +14,7 @@
                     <div class="card-body">
                         <h5 class="card-title font-weight-bold">{{ $product->title }}</h5>
                         <p class="card-text">{{ $product->description }}</p>
+                        <p class="card-text"><small class="text-muted">By {{ $product->user->name }}</small></p>
                         <a href="{{ $product->product_url }}" class="btn btn-primary btn-block" target="_blank">View Product</a>
                     </div>
                 </div>
