@@ -5,7 +5,7 @@
     <h1 class="text-4xl my-8">Published Puzzles</h1>
     <div class="flex flex-wrap justify-center">
         @foreach($publishedProducts as $product)
-            <div class="w-full md:w-1/3 lg:w-1/4 p-4">
+            <div class="w-1/3 md:w-1/3 lg:w-1/4 p-4">
                 <div class="bg-white rounded-lg shadow-md overflow-hidden">
                     <img src="{{ Storage::url($product->cropped_image) }}" class="w-full h-64 object-cover" alt="{{ $product->title }}">
                     <div class="p-4">
