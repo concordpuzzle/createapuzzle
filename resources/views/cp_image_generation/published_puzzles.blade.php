@@ -1,17 +1,17 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container text-center">
-    <h1 style="font-size: 33px; margin-top: 30px; margin-bottom: 30px;">Published Puzzles</h1>
-    <div class="row justify-content-center">
+<div class="container mx-auto text-center">
+    <h1 class="text-4xl my-8">Published Puzzles</h1>
+    <div class="flex flex-wrap justify-center">
         @foreach($publishedProducts as $product)
-            <div class="col-md-4 d-flex justify-content-center mb-4">
-                <div class="card shadow-sm">
-                    <img src="{{ Storage::url($product->cropped_image) }}" class="card-img-top" alt="{{ $product->title }}" style="border-radius: 4px;">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">{{ $product->title }}</h5>
-                        <p class="card-text">{{ $product->description }}</p>
-                        <a href="{{ $product->product_url }}" class="btn btn-primary" target="_blank">View Product</a>
+            <div class="w-full md:w-1/3 lg:w-1/4 p-4">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <img src="{{ Storage::url($product->cropped_image) }}" class="w-full h-64 object-cover" alt="{{ $product->title }}">
+                    <div class="p-4">
+                        <h5 class="text-lg font-bold mb-2">{{ $product->title }}</h5>
+                        <p class="text-gray-600 mb-4">{{ $product->description }}</p>
+                        <a href="{{ $product->product_url }}" class="inline-block bg-red-700 text-white py-2 px-4 rounded" target="_blank">View Product</a>
                     </div>
                 </div>
             </div>
