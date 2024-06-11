@@ -26,21 +26,19 @@ class CPImageGenerationController extends Controller
     public function crop(Request $request)
     {
         $request->validate([
-            'cropped_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'cropped_image' => 'required|image',
         ]);
-    
-        if ($request->hasFile('cropped_image')) {
-            $image = $request->file('cropped_image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $imagePath = 'public/generated_images/' . $imageName;
-    
-            // Save the cropped image
-            Storage::put($imagePath, file_get_contents($image->getRealPath()));
-    
-            return response()->json(['success' => true, 'image_path' => Storage::url($imagePath)]);
+
+        try {
+            $croppedImage = $request->file('cropped_image');
+            $path = $croppedImage->store('public/generated_images');
+            Log::info('Cropped image saved successfully', ['path' => $path]);
+
+            return response()->json(['success' => true, 'path' => Storage::url($path)]);
+        } catch (\Exception $e) {
+            Log::error('Error during image cropping', ['error' => $e->getMessage()]);
+            return response()->json(['success' => false, 'error' => $e->getMessage()]);
         }
-    
-        return response()->json(['success' => false]);
     }
 
     public function store(Request $request)
