@@ -19,6 +19,9 @@
         background-color: #0c2461;
         color: white;
     }
+    .upscale-button:hover {
+        color: #f5f6fa;
+    }
     .prompt-input {
         font-size: 33px;
         text-align: center;
@@ -29,10 +32,16 @@
         color: white;
         margin-right: 5px;
     }
+    .append-button:hover {
+        color: #f5f6fa;
+    }
     .create-button {
         font-size: 22px;
         background-color: #b71540;
         color: white;
+    }
+    .create-button:hover {
+        color: #f5f6fa;
     }
 </style>
 
@@ -54,8 +63,8 @@
                 <button type="button" class="btn append-button radio-canada-big" onclick="appendText('photorealistic')">📸 Photorealistic</button>
                 <button type="button" class="btn append-button radio-canada-big" onclick="appendText('illustration')">🖌️ Illustration</button>
                 <button type="button" class="btn append-button radio-canada-big" onclick="appendText('painting')">🎨 Painting</button>
-            </div>
-            <input type="text" class="form-control radio-canada-big prompt-input" id="prompt" name="prompt" placeholder="Generate custom puzzle picture options with a prompt!" required>
+            </div><br>
+            <input type="text" class="form-control radio-canada-big prompt-input" id="prompt" name="prompt" placeholder="Generate custom puzzle picture options with a prompt!" required><br>
         </div>
         <button type="submit" class="btn create-button radio-canada-big">Create Puzzle Pictures</button>
     </form>
@@ -98,6 +107,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <script>
     let imageId;
     let messageId;
