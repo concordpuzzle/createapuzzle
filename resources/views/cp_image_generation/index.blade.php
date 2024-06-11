@@ -19,6 +19,9 @@
         background-color: #0c2461;
         color: white;
     }
+    .prompt-input {
+        font-size: 33px;
+    }
 </style>
 
 <div class="container text-center my-4">
@@ -37,7 +40,7 @@
         @csrf
         <div class="form-group">
             <label for="prompt" class="radio-canada-big">Prompt</label>
-            <input type="text" class="form-control radio-canada-big" id="prompt" name="prompt" placeholder="Enter your image prompt" required>
+            <input type="text" class="form-control radio-canada-big prompt-input" id="prompt" name="prompt" placeholder="Enter your image prompt" required>
         </div>
         <button type="submit" class="btn btn-primary radio-canada-big" style="background-color: #0c2461; color: white;">Create Pictures</button>
     </form>
@@ -51,10 +54,22 @@
                     <div class="card-body text-center">
                         <p class="card-text radio-canada-big">{{ $image->prompt }}</p>
                         <div class="mt-3">
-                            <button class="btn upscale-button radio-canada-big" onclick="upscaleImage('{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U1')">Top Left</button>
-                            <button class="btn upscale-button radio-canada-big" onclick="upscaleImage('{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U2')">Top Right</button>
-                            <button class="btn upscale-button radio-canada-big" onclick="upscaleImage('{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U3')">Bottom Left</button>
-                            <button class="btn upscale-button radio-canada-big" onclick="upscaleImage('{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U4')">Bottom Right</button>
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <button class="btn upscale-button radio-canada-big w-100" onclick="upscaleImage('{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U1')">Top Left</button>
+                                </div>
+                                <div class="col">
+                                    <button class="btn upscale-button radio-canada-big w-100" onclick="upscaleImage('{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U2')">Top Right</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <button class="btn upscale-button radio-canada-big w-100" onclick="upscaleImage('{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U3')">Bottom Left</button>
+                                </div>
+                                <div class="col">
+                                    <button class="btn upscale-button radio-canada-big w-100" onclick="upscaleImage('{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U4')">Bottom Right</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
