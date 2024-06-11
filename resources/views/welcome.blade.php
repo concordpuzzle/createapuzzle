@@ -71,13 +71,13 @@
 
                 <div class="mt-16">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                        <a href="https://laravel.com/docs" class="scale-100 p-6 bg-white rounded-lg shadow-none  flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
+                        <a href="https://make.concordpuzzle.com/dashboard" class="scale-100 p-6 bg-white rounded-lg shadow-none  flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                             <div>
                                 <div style="background-color:#0c2461" class="h-16 w-16 flex items-center justify-center rounded-full">
                                     <i class="fa-solid fa-camera-retro" style="color:#fff;font-size:22px;"></i>
                                 </div>
 
-                                <h2 class="mt-6 text-xl font-semibold text-gray-900">Make a <u>Photo</u> Puzzle</h2>
+                                <h2 class="mt-6 text-xl font-semibold text-gray-900">Make a <u>Generative AI</u> Puzzle</h2>
 
                                 <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
                                 Upload your own photo to create a unique, custom jigsaw puzzle. Choose the number of pieces and other options.</p>
