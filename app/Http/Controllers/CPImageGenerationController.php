@@ -91,7 +91,7 @@ class CPImageGenerationController extends Controller
                 $progressData = $progressResponse->json();
     
                 if (isset($progressData['status'])) {
-                    if ($progressData['status'] === 'COMPLETED' && isset($progressData['uri'])) {
+                    if ($progressData['status'] === 'DONE' && isset($progressData['uri'])) {
                         $imageUrl = $progressData['uri'];
                         break;
                     } elseif ($progressData['status'] === 'FAILED') {
@@ -132,7 +132,7 @@ class CPImageGenerationController extends Controller
             return redirect()->route('cp_image_generation.index')->with('error', 'Failed to generate image.');
         }
     }
-    
+        
 
     
 
