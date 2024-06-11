@@ -30,6 +30,7 @@
 
     .sleek-input {
         margin-top: 15px;
+        margin-bottom: 15px;
         border: none;
         border-radius: 3px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -42,6 +43,8 @@
         border: none;
         padding: 10px 20px;
         font-size: 16px;
+        margin-top: 15px;
+        margin-bottom: 15px;
     }
 
     .create-puzzle-btn:hover {
