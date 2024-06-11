@@ -52,7 +52,7 @@ class CPImageGenerationController extends Controller
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $apiKey,
             'Content-Type' => 'application/json'
-        ])->post($apiUrl, [
+        ])->post($apiUrl . '/api/v1/midjourney/imagine', [
             'prompt' => $prompt,
         ]);
 
@@ -87,7 +87,7 @@ class CPImageGenerationController extends Controller
                 'body' => $progressResponse->body(),
             ]);
 
-            if ($progressResponse->json()['success']) {
+            if (isset($progressResponse->json()['success']) && $progressResponse->json()['success']) {
                 if (isset($progressResponse->json()['uri'])) {
                     $imageUrl = $progressResponse->json()['uri'];
                     break;
@@ -123,6 +123,7 @@ class CPImageGenerationController extends Controller
         return redirect()->route('cp_image_generation.index')->with('error', 'Failed to generate image.');
     }
 }
+
 
 
     public function crop(Request $request)
