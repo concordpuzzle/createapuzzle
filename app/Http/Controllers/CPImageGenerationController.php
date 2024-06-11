@@ -34,11 +34,23 @@ class CPImageGenerationController extends Controller
             $path = $croppedImage->store('public/generated_images');
             Log::info('Cropped image saved successfully', ['path' => $path]);
 
-            return response()->json(['success' => true, 'path' => Storage::url($path)]);
+            // Save cropped image information to database
+            $image = CPImageGeneration::create([
+                'prompt' => 'Cropped Image',
+                'generated_image' => $path,
+            ]);
+
+            return response()->json(['success' => true, 'id' => $image->id, 'path' => Storage::url($path)]);
         } catch (\Exception $e) {
             Log::error('Error during image cropping', ['error' => $e->getMessage()]);
             return response()->json(['success' => false, 'error' => $e->getMessage()]);
         }
+    }
+
+    public function showCropped($id)
+    {
+        $image = CPImageGeneration::findOrFail($id);
+        return view('cp_image_generation.cropped', compact('image'));
     }
 
     public function store(Request $request)

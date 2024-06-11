@@ -77,7 +77,7 @@ function openCropModal(imageUrl) {
     $('#cropModal').on('shown.bs.modal', function () {
         console.log('Initializing Cropper.js');
         cropper = new Cropper(document.getElementById('imageToCrop'), {
-            aspectRatio: 1.35 / 1,  // Change to your desired ratio
+            aspectRatio: 16 / 9,  // Change to your desired ratio
             viewMode: 1
         });
     }).on('hidden.bs.modal', function () {
@@ -131,7 +131,7 @@ function cropImage() {
         .then(data => {
             console.log('Server response:', data);
             if (data.success) {
-                location.reload();  // Reload the page to show the cropped image
+                window.location.href = `/cp-image-generation/cropped/${data.id}`;
             } else {
                 alert('Crop failed');
                 console.error('Crop failed:', data.error);
@@ -143,6 +143,7 @@ function cropImage() {
         });
     }, 'image/png');
 }
+
 
 </script>
 @endsection
