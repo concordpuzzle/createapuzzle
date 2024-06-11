@@ -40,3 +40,5 @@ use App\Http\Controllers\CPImageGenerationController;
 
 Route::get('/cp-image-generation', [CPImageGenerationController::class, 'index'])->name('cp_image_generation.index');
 Route::post('/cp-image-generation', [CPImageGenerationController::class, 'store'])->name('cp_image_generation.store');
+
+Route::post('/cp-image-generation/crop', [CPImageGenerationController::class, 'crop'])->name('cp_image_generation.crop');

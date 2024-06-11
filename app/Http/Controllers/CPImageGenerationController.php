@@ -11,12 +11,40 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
+use Intervention\Image\ImageManagerStatic as Image;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+
+
+
+
 class CPImageGenerationController extends Controller
 {
     public function index()
     {
         $images = CPImageGeneration::all();
         return view('cp_image_generation.index', compact('images'));
+    }
+
+    public function crop(Request $request)
+    {
+        $request->validate([
+            'cropped_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+    
+        if ($request->hasFile('cropped_image')) {
+            $image = $request->file('cropped_image');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $imagePath = 'public/generated_images/' . $imageName;
+    
+            // Save the cropped image
+            Storage::put($imagePath, file_get_contents($image->getRealPath()));
+    
+            return response()->json(['success' => true, 'image_path' => Storage::url($imagePath)]);
+        }
+    
+        return response()->json(['success' => false]);
     }
 
     public function store(Request $request)
