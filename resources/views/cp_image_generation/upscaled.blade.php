@@ -4,15 +4,22 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
-<div class="container">
-    <h1>Upscaled Image</h1>
-    <div class="card mb-4 shadow-sm">
-        <img src="{{ Storage::url($image->generated_image) }}" class="card-img-top" alt="{{ $image->prompt }}">
-        <div class="card-body">
-            <p class="card-text">{{ $image->prompt }}</p>
-            <button class="btn btn-primary" onclick="openCropModal('{{ Storage::url($image->generated_image) }}', '{{ $image->id }}')">Crop Image</button>
+<div class="container text-center">
+    <h1>Crop Your Upscaled Image</h1>
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
         </div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
+    <div class="mb-4">
+        <img id="imageToCrop" src="{{ Storage::url($image->generated_image) }}" class="img-fluid" alt="Upscaled Image">
     </div>
+    <button class="btn btn-primary" onclick="cropImage()">Crop Image</button>
 
     <!-- Crop Modal -->
     <div id="cropModal" class="modal" tabindex="-1" role="dialog">
@@ -25,10 +32,10 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <img id="imageToCrop" src="" style="max-width: 100%;">
+                    <img id="imageToCropModal" src="" style="max-width: 100%;">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="cropImage()">Crop</button>
+                    <button type="button" class="btn btn-primary" onclick="submitCroppedImage()">Submit Cropped Image</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -44,15 +51,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <script>
     let cropper;
-    let imageId;
 
-    function openCropModal(imageUrl, id) {
-        document.getElementById('imageToCrop').src = imageUrl;
-        imageId = id;
+    function cropImage() {
+        const image = document.getElementById('imageToCrop');
         $('#cropModal').modal('show');
         $('#cropModal').on('shown.bs.modal', function () {
-            cropper = new Cropper(document.getElementById('imageToCrop'), {
-                aspectRatio: 1.35 / 1,  // Change to your desired ratio
+            const imageToCropModal = document.getElementById('imageToCropModal');
+            imageToCropModal.src = image.src;
+            cropper = new Cropper(imageToCropModal, {
+                aspectRatio: 16 / 9,
                 viewMode: 1
             });
         }).on('hidden.bs.modal', function () {
@@ -61,7 +68,7 @@
         });
     }
 
-    function cropImage() {
+    function submitCroppedImage() {
         const canvas = cropper.getCroppedCanvas();
         const croppedImage = canvas.toDataURL('image/png');
         const croppedCanvas = document.getElementById('croppedCanvas');
@@ -85,7 +92,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    location.href = '{{ url('cp-image-generation/cropped') }}/' + data.id;  // Redirect to cropped view
+                    location.href = '{{ url('cp-image-generation/cropped') }}/' + data.id;
                 } else {
                     alert('Crop failed: ' + data.error);
                 }
