@@ -101,10 +101,14 @@ function cropImage() {
     croppedCanvas.height = canvas.height;
     context.drawImage(canvas, 0, 0);
 
+    console.log('Cropped image generated');
+
     // Send the cropped image data to the server
     canvas.toBlob(function(blob) {
         const formData = new FormData();
         formData.append('cropped_image', blob, 'cropped.png');
+
+        console.log('Sending cropped image to server', formData);
 
         fetch('{{ route('cp_image_generation.crop') }}', {
             method: 'POST',
@@ -113,8 +117,14 @@ function cropImage() {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('Server response', data);
             if (data.success) {
                 location.href = '{{ url('cp-image-generation/cropped') }}/' + data.id;  // Redirect to cropped view
             } else {
@@ -125,8 +135,9 @@ function cropImage() {
             console.error('Error:', error);
             alert('Crop failed: ' + error.message);
         });
-    });
+    }, 'image/png');
 }
+
 
 
 
