@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container text-center">
     <h1>Your Cropped Image</h1>
-    <div class="card mb-4 shadow-sm">
+    <div class="card mb-4 shadow-sm mx-auto" style="max-width: 600px;">
         <img src="{{ Storage::url($image->generated_image) }}" class="card-img-top" alt="Cropped Image">
         <div class="card-body">
             <form method="POST" action="{{ route('cp_image_generation.create_product') }}">
