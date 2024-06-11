@@ -35,5 +35,8 @@ return [
     'key' => env('OPENAI_API_KEY'),
 ],
 
+'midjourney' => [
+    'api_key' => env('MIDJOURNEY_API_KEY'),
+],
 
 ];

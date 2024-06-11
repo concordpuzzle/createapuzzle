@@ -144,14 +144,25 @@ class CPImageGenerationController extends Controller
     
             // Prepare the data for the MidJourney upscale request
             $apiKey = config('services.midjourney.api_key');
+            if (!$apiKey) {
+                throw new \Exception('MidJourney API key is not set.');
+            }
+    
             $apiUrl = 'https://api.mymidjourney.ai/api/v1/midjourney/button';
     
             // Make the request to MidJourney API
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
+                'Content-Type' => 'application/json'
             ])->post($apiUrl, [
                 'messageId' => $image->midjourney_message_id,  // Assuming you have saved the messageId when generating the image
                 'button' => $button,
+            ]);
+    
+            // Log the full response for debugging
+            Log::info('MidJourney API upscale response', [
+                'status' => $response->status(),
+                'body' => $response->body(),
             ]);
     
             if ($response->successful()) {
@@ -171,6 +182,7 @@ class CPImageGenerationController extends Controller
             return response()->json(['success' => false, 'error' => $e->getMessage()]);
         }
     }
+    
     
 
     public function crop(Request $request)
