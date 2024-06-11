@@ -59,7 +59,7 @@
         </div>
         <button type="submit" class="btn create-button radio-canada-big">Create Puzzle Pictures</button>
     </form>
-    <hr>
+    <br>
     <h2 class="radio-canada-big mb-5" style="font-size: 28px;">Picture Options</h2>
     <div class="row justify-content-center">
         @foreach($images as $image)
