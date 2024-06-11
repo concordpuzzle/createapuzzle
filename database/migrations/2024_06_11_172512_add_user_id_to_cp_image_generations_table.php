@@ -6,30 +6,16 @@ use Illuminate\Support\Facades\Schema;
 
 class AddUserIdToCpImageGenerationsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::table('c_p_image_generations', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id')->after('id');
-
-            // Assuming you have a users table and want to add a foreign key constraint
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('user_id')->nullable()->after('id');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::table('c_p_image_generations', function (Blueprint $table) {
-            $table->dropForeign(['user_id']);
             $table->dropColumn('user_id');
         });
     }
