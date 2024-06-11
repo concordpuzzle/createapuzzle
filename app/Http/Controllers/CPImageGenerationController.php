@@ -168,8 +168,10 @@ public function createProduct(Request $request)
             ]
         );
 
+        $cleanedImagePath = str_replace('public/', '', $image->generated_image);
+
         // Generate the correct URL for the image
-        $imageUrl = asset('storage/' . $image->generated_image);
+        $imageUrl = asset('storage/' . $cleanedImagePath);
 
         $data = [
             'name' => 'Custom Puzzle - ' . $image->prompt,
