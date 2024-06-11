@@ -55,7 +55,7 @@
                 <button type="button" class="btn append-button radio-canada-big" onclick="appendText('illustration')">🖌️ Illustration</button>
                 <button type="button" class="btn append-button radio-canada-big" onclick="appendText('painting')">🎨 Painting</button>
             </div>
-            <input type="text" class="form-control radio-canada-big prompt-input" id="prompt" name="prompt" placeholder="Generate custom puzzle picture options with a prompt." required><br>
+            <input type="text" class="form-control radio-canada-big prompt-input" id="prompt" name="prompt" placeholder="Generate custom puzzle picture options with a prompt!" required>
         </div>
         <button type="submit" class="btn create-button radio-canada-big">Create Puzzle Pictures</button>
     </form>
