@@ -1,13 +1,15 @@
+
 <!-- resources/views/cp_image_generation/index.blade.php -->
+@extends('layouts.app')
+
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+<!-- resources/views/cp_image_generation/index.blade.php -->
 
 
 @livewireStyles
 @livewireScripts
 
-<!-- resources/views/cp_image_generation/index.blade.php -->
-@extends('layouts.app')
 
 @section('content')
 <div class="container">
