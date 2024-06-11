@@ -75,8 +75,8 @@ class CPImageGenerationController extends Controller
         $imageUrl = null;
 
         // Polling mechanism to check the image generation status
-        for ($i = 0; $i < 10; $i++) {
-            sleep(5); // Wait for 5 seconds before checking the status again
+        for ($i = 0; $i < 30; $i++) { // Increase the number of retries to allow more time for processing
+            sleep(10); // Wait for 10 seconds before checking the status again
 
             $progressResponse = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
@@ -88,13 +88,15 @@ class CPImageGenerationController extends Controller
                 'body' => $progressResponse->body(),
             ]);
 
-            if (isset($progressResponse->json()['success']) && $progressResponse->json()['success']) {
-                if (isset($progressResponse->json()['uri'])) {
-                    $imageUrl = $progressResponse->json()['uri'];
-                    break;
-                }
-            } else {
-                throw new \Exception('Failed to track progress: ' . $progressResponse->body());
+            $progressData = $progressResponse->json();
+
+            if (isset($progressData['status']) && $progressData['status'] === 'COMPLETED' && isset($progressData['uri'])) {
+                $imageUrl = $progressData['uri'];
+                break;
+            } elseif (isset($progressData['status']) && $progressData['status'] === 'FAILED') {
+                throw new \Exception('Image generation failed: ' . $progressResponse->body());
+            } elseif (!isset($progressData['status']) || $progressData['status'] !== 'PROCESSING') {
+                throw new \Exception('Unexpected response: ' . $progressResponse->body());
             }
         }
 
