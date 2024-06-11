@@ -149,61 +149,63 @@ class CPImageGenerationController extends Controller
     }
 
     public function createProduct(Request $request)
-    {
-        $request->validate([
-            'image_id' => 'required|integer',
-        ]);
-    
-        $image = CPImageGeneration::findOrFail($request->image_id);
-    
-        try {
-            $woocommerce = new Client(
-                env('WOOCOMMERCE_SITE_URL'),
-                env('WOOCOMMERCE_CONSUMER_KEY'),
-                env('WOOCOMMERCE_CONSUMER_SECRET'),
+{
+    $request->validate([
+        'image_id' => 'required|integer',
+    ]);
+
+    $image = CPImageGeneration::findOrFail($request->image_id);
+
+    try {
+        $woocommerce = new Client(
+            env('WOOCOMMERCE_SITE_URL'),
+            env('WOOCOMMERCE_CONSUMER_KEY'),
+            env('WOOCOMMERCE_CONSUMER_SECRET'),
+            [
+                'wp_api' => true,
+                'version' => 'wc/v3',
+            ]
+        );
+
+        // Generate the correct URL for the image
+        $imageUrl = asset('storage/' . $image->generated_image);
+
+        $data = [
+            'name' => 'Custom Puzzle - ' . $image->prompt,
+            'type' => 'simple',
+            'regular_price' => '19.99',
+            'description' => 'A custom puzzle generated from your image prompt.',
+            'images' => [
                 [
-                    'wp_api' => true,
-                    'version' => 'wc/v3',
-                ]
-            );
-    
-            $imageUrl = asset('storage/'.$image->generated_image);
-    
-            $data = [
-                'name' => 'Custom Puzzle - ' . $image->prompt,
-                'type' => 'simple',
-                'regular_price' => '19.99',
-                'description' => 'A custom puzzle generated from your image prompt.',
-                'images' => [
-                    [
-                        'src' => $imageUrl,
-                        'alt' => $image->prompt,
-                    ],
+                    'src' => $imageUrl,
+                    'alt' => $image->prompt,
                 ],
-                'categories' => [
-                    [
-                        'id' => 1, // Replace with your actual category ID
-                    ],
+            ],
+            'categories' => [
+                [
+                    'id' => 1, // Replace with your actual category ID
                 ],
-            ];
-    
-            $product = $woocommerce->post('products', $data);
-    
-            return response()->json([
-                'success' => true,
-                'product' => $product,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error creating WooCommerce product', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-            ]);
-    
-            return response()->json(['success' => false, 'error' => $e->getMessage()]);
-        }
+            ],
+        ];
+
+        $product = $woocommerce->post('products', $data);
+
+        return response()->json([
+            'success' => true,
+            'product' => $product,
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error creating WooCommerce product', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ]);
+
+        return response()->json(['success' => false, 'error' => $e->getMessage()]);
     }
+}
+
     
 
 }
