@@ -36,7 +36,6 @@
 </style>
 
 <div class="container text-center my-4">
-    <h1 class="radio-canada-big mb-5" style="font-size: 33px;">Generate Your Custom Image</h1>
     @if(session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
@@ -55,7 +54,7 @@
                 <button type="button" class="btn append-button radio-canada-big" onclick="appendText('illustration')">🖌️ Illustration</button>
                 <button type="button" class="btn append-button radio-canada-big" onclick="appendText('painting')">🎨 Painting</button>
             </div>
-            <label for="prompt" class="radio-canada-big">Prompt</label>
+            <label for="prompt" class="radio-canada-big">Generate custom puzzle picture options with a prompt.</label>
             <input type="text" class="form-control radio-canada-big prompt-input" id="prompt" name="prompt" placeholder="Enter your image prompt" required>
         </div>
         <button type="submit" class="btn create-button radio-canada-big">Create Puzzle Pictures</button>
