@@ -309,15 +309,18 @@ public function createProduct(Request $request)
             ];
 
             $product = $woocommerce->post('products', $data);
-            return response()->json(['success' => true, 'product' => $product]);
+
+            // Get the product URL
+            $productUrl = $product->permalink;
+            return redirect($productUrl);
 
         } catch (HttpClientException $e) {
             $error = $e->getMessage();
             Log::error("Error creating product: cURL Error: $error");
-            return response()->json(['success' => false, 'error' => $error]);
+            return back()->with('error', $error);
         }
     }
-    
+
 public function crop(Request $request)
     {
         Log::info('Cropping image request received', ['request' => $request->all()]);
