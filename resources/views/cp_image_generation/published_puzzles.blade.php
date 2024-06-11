@@ -5,8 +5,8 @@
     <h1 style="font-size: 33px; margin-top: 30px; margin-bottom: 30px;">Published Puzzles</h1>
     <div class="row justify-content-center">
         @foreach($publishedProducts as $product)
-            <div class="col-md-4 d-flex justify-content-center">
-                <div class="card mb-4 shadow-sm">
+            <div class="col-md-4 d-flex justify-content-center mb-4">
+                <div class="card shadow-sm">
                     <img src="{{ Storage::url($product->cropped_image) }}" class="card-img-top" alt="{{ $product->title }}" style="border-radius: 4px;">
                     <div class="card-body text-center">
                         <h5 class="card-title">{{ $product->title }}</h5>
