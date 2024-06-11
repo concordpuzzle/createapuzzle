@@ -1,4 +1,3 @@
-<!-- resources/views/cp_image_generation/index.blade.php -->
 @extends('layouts.app')
 
 @section('content')
@@ -95,11 +94,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <script>
     let cropper;
-    let imageId;
     let messageId;
     function openCropModal(imageUrl, id) {
         document.getElementById('imageToCrop').src = imageUrl;
-        imageId = id;
+        messageId = id;
         $('#cropModal').modal('show');
         $('#cropModal').on('shown.bs.modal', function () {
             cropper = new Cropper(document.getElementById('imageToCrop'), {
@@ -148,8 +146,8 @@
         });
     }
 
-    function openUpscaleModal(midjourneyMessageId) {
-        messageId = midjourneyMessageId;
+    function openUpscaleModal(id) {
+        messageId = id;
         $('#upscaleModal').modal('show');
     }
 
@@ -169,7 +167,6 @@
         .then(data => {
             if (data.success) {
                 alert('Upscaling initiated');
-                location.href = '{{ url('cp-image-generation/upscaled') }}/' + data.id;  // Redirect to upscaled view
             } else {
                 alert('Upscaling failed: ' + data.error);
             }
