@@ -4,7 +4,6 @@
 @livewireStyles
 @livewireScripts
 
-@livewire('navigation-menu')
 <!-- resources/views/cp_image_generation/index.blade.php -->
 
 @extends('layouts.app')
