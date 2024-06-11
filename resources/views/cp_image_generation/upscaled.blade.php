@@ -59,16 +59,27 @@
             const imageToCropModal = document.getElementById('imageToCropModal');
             imageToCropModal.src = image.src;
             cropper = new Cropper(imageToCropModal, {
-                aspectRatio: 16 / 9,
+                aspectRatio: 1.35 / 1,
                 viewMode: 1
             });
+            console.log('Cropper initialized');
         }).on('hidden.bs.modal', function () {
-            cropper.destroy();
-            cropper = null;
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+                console.log('Cropper destroyed');
+            } else {
+                console.log('Cropper not initialized');
+            }
         });
     }
 
     function submitCroppedImage() {
+        if (!cropper) {
+            console.error('Cropper is not initialized');
+            return;
+        }
+
         const canvas = cropper.getCroppedCanvas();
         const croppedImage = canvas.toDataURL('image/png');
         const croppedCanvas = document.getElementById('croppedCanvas');
@@ -104,4 +115,5 @@
         });
     }
 </script>
+
 @endsection
