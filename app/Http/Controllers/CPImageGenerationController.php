@@ -21,109 +21,109 @@ class CPImageGenerationController extends Controller
     }
 
     public function store(Request $request)
-{
-    Log::info('Image generation request received', ['request' => $request->all()]);
-
-    $request->validate([
-        'prompt' => 'required|string|max:255',
-    ]);
-
-    $prompt = $request->input('prompt');
-    $apiKey = env('MIDJOURNEY_API_TOKEN');
-    $apiUrl = env('MIDJOURNEY_API_URL');
-
-    if (!$apiUrl || !$apiKey) {
-        Log::error('MidJourney API URL or Token is not set', [
-            'apiUrl' => $apiUrl,
-            'apiKey' => $apiKey
+    {
+        Log::info('Image generation request received', ['request' => $request->all()]);
+    
+        $request->validate([
+            'prompt' => 'required|string|max:255',
         ]);
-        return redirect()->route('cp_image_generation.index')->with('error', 'MidJourney API URL or Token is not set.');
-    }
-
-    try {
-        // Log the request being sent to MidJourney API
-        Log::info('Sending request to MidJourney API', [
-            'url' => $apiUrl,
-            'prompt' => $prompt,
-            'headers' => ['Authorization' => 'Bearer ' . $apiKey]
-        ]);
-
-        // Send the prompt to MidJourney API
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $apiKey,
-            'Content-Type' => 'application/json'
-        ])->post($apiUrl . '/api/v1/midjourney/imagine', [
-            'prompt' => $prompt,
-        ]);
-
-        // Log the response received from MidJourney API
-        Log::info('Response from MidJourney API', [
-            'status' => $response->status(),
-            'body' => $response->body(),
-        ]);
-
-        if ($response->failed()) {
-            throw new \Exception('Failed to get a successful response from MidJourney API: ' . $response->body());
+    
+        $prompt = $request->input('prompt');
+        $apiKey = env('MIDJOURNEY_API_TOKEN');
+        $apiUrl = env('MIDJOURNEY_API_URL');
+    
+        if (!$apiUrl || !$apiKey) {
+            Log::error('MidJourney API URL or Token is not set', [
+                'apiUrl' => $apiUrl,
+                'apiKey' => $apiKey
+            ]);
+            return redirect()->route('cp_image_generation.index')->with('error', 'MidJourney API URL or Token is not set.');
         }
-
-        // Assuming the API returns a messageId and status
-        $messageId = $response->json()['messageId'];
-
-        // Track the progress of the image generation
-        $progressUrl = $apiUrl . '/api/v1/midjourney/message/' . $messageId;
-        $imageUrl = null;
-
-        // Polling mechanism to check the image generation status
-        for ($i = 0; $i < 10; $i++) {
-            sleep(5); // Wait for 5 seconds before checking the status again
-
-            $progressResponse = Http::withHeaders([
+    
+        try {
+            // Log the request being sent to MidJourney API
+            Log::info('Sending request to MidJourney API', [
+                'url' => $apiUrl . '/api/v1/midjourney/imagine',
+                'prompt' => $prompt,
+                'headers' => ['Authorization' => 'Bearer ' . $apiKey]
+            ]);
+    
+            // Send the prompt to MidJourney API
+            $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
                 'Content-Type' => 'application/json'
-            ])->get($progressUrl);
-
-            Log::info('Progress response from MidJourney API', [
-                'status' => $progressResponse->status(),
-                'body' => $progressResponse->body(),
+            ])->post($apiUrl . '/api/v1/midjourney/imagine', [
+                'prompt' => $prompt,
             ]);
-
-            if (isset($progressResponse->json()['success']) && $progressResponse->json()['success']) {
-                if (isset($progressResponse->json()['uri'])) {
-                    $imageUrl = $progressResponse->json()['uri'];
-                    break;
-                }
-            } else {
-                throw new \Exception('Failed to track progress: ' . $progressResponse->body());
+    
+            // Log the response received from MidJourney API
+            Log::info('Response from MidJourney API', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+    
+            if ($response->failed()) {
+                throw new \Exception('Failed to get a successful response from MidJourney API: ' . $response->body());
             }
+    
+            // Assuming the API returns a messageId and status
+            $messageId = $response->json()['messageId'];
+    
+            // Track the progress of the image generation
+            $progressUrl = $apiUrl . '/api/v1/midjourney/message/' . $messageId;
+            $imageUrl = null;
+    
+            // Polling mechanism to check the image generation status
+            for ($i = 0; $i < 10; $i++) {
+                sleep(5); // Wait for 5 seconds before checking the status again
+    
+                $progressResponse = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Content-Type' => 'application/json'
+                ])->get($progressUrl);
+    
+                Log::info('Progress response from MidJourney API', [
+                    'status' => $progressResponse->status(),
+                    'body' => $progressResponse->body(),
+                ]);
+    
+                if (isset($progressResponse->json()['success']) && $progressResponse->json()['success']) {
+                    if (isset($progressResponse->json()['uri'])) {
+                        $imageUrl = $progressResponse->json()['uri'];
+                        break;
+                    }
+                } else {
+                    throw new \Exception('Failed to track progress: ' . $progressResponse->body());
+                }
+            }
+    
+            if (!$imageUrl) {
+                throw new \Exception('Failed to get image URL after polling.');
+            }
+    
+            // Store the image locally
+            $imageContents = file_get_contents($imageUrl);
+            $imageName = 'generated_images/' . uniqid() . '.png';
+            Storage::put('public/' . $imageName, $imageContents);
+    
+            // Save the image information to the database
+            $image = CPImageGeneration::create([
+                'prompt' => $prompt,
+                'generated_image' => $imageName,
+            ]);
+    
+            return redirect()->route('cp_image_generation.index')->with('success', 'Image generated successfully.');
+        } catch (\Exception $e) {
+            Log::error('Error generating image', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            return redirect()->route('cp_image_generation.index')->with('error', 'Failed to generate image.');
         }
-
-        if (!$imageUrl) {
-            throw new \Exception('Failed to get image URL after polling.');
-        }
-
-        // Store the image locally
-        $imageContents = file_get_contents($imageUrl);
-        $imageName = 'generated_images/' . uniqid() . '.png';
-        Storage::put('public/' . $imageName, $imageContents);
-
-        // Save the image information to the database
-        $image = CPImageGeneration::create([
-            'prompt' => $prompt,
-            'generated_image' => $imageName,
-        ]);
-
-        return redirect()->route('cp_image_generation.index')->with('success', 'Image generated successfully.');
-    } catch (\Exception $e) {
-        Log::error('Error generating image', [
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-        ]);
-        return redirect()->route('cp_image_generation.index')->with('error', 'Failed to generate image.');
     }
-}
-
+    
 
 
     public function crop(Request $request)
