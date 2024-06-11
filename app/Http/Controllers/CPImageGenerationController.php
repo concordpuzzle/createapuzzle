@@ -52,7 +52,7 @@ class CPImageGenerationController extends Controller
         $apiKey = env('OPENAI_API_KEY');
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $apiKey,
-        ])->post('https://api.openai.com/v1/images', [
+        ])->post('https://api.openai.com/v1/images/generations', [  // Correct the endpoint here
             'prompt' => $prompt,
             'n' => 1,
             'size' => '512x512',
