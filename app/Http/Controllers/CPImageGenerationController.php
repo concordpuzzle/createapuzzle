@@ -82,7 +82,7 @@ class CPImageGenerationController extends Controller
         ])->post('https://api.openai.com/v1/images/generations', [
             'prompt' => $prompt,
             'n' => 1,
-            'size' => '1792x1024',
+            'size' => '512x512',
         ]);
 
         Log::info('OpenAI API response', ['response' => $response->body()]);
