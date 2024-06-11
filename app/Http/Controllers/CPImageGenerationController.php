@@ -134,54 +134,59 @@ class CPImageGenerationController extends Controller
     }
         
     public function upscale(Request $request)
-    {
-        $button = $request->input('button');
-        $imageId = $request->input('image_id');
-    
-        try {
-            // Retrieve the image record from the database
-            $image = CPImageGeneration::findOrFail($imageId);
-    
-            // Prepare the data for the MidJourney upscale request
-            $apiKey = config('services.midjourney.api_key');
-            if (!$apiKey) {
-                throw new \Exception('MidJourney API key is not set.');
-            }
-    
-            $apiUrl = 'https://api.mymidjourney.ai/api/v1/midjourney/button';
-    
-            // Make the request to MidJourney API
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $apiKey,
-                'Content-Type' => 'application/json'
-            ])->post($apiUrl, [
-                'messageId' => $image->midjourney_message_id,  // Assuming you have saved the messageId when generating the image
-                'button' => $button,
-            ]);
-    
-            // Log the full response for debugging
-            Log::info('MidJourney API upscale response', [
+{
+    $button = $request->input('button');
+    $imageId = $request->input('image_id');
+
+    try {
+        // Retrieve the image record from the database
+        $image = CPImageGeneration::findOrFail($imageId);
+
+        // Prepare the data for the MidJourney upscale request
+        $apiKey = config('services.midjourney.api_key');
+        
+        // Log the API key for debugging
+        Log::info('MidJourney API Key', ['api_key' => $apiKey]);
+
+        if (!$apiKey) {
+            throw new \Exception('MidJourney API key is not set.');
+        }
+
+        $apiUrl = 'https://api.mymidjourney.ai/api/v1/midjourney/button';
+
+        // Make the request to MidJourney API
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $apiKey,
+            'Content-Type' => 'application/json'
+        ])->post($apiUrl, [
+            'messageId' => $image->midjourney_message_id,  // Assuming you have saved the messageId when generating the image
+            'button' => $button,
+        ]);
+
+        // Log the full response for debugging
+        Log::info('MidJourney API upscale response', [
+            'status' => $response->status(),
+            'body' => $response->body(),
+        ]);
+
+        if ($response->successful()) {
+            return response()->json(['success' => true]);
+        } else {
+            Log::error('Error upscaling image', [
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
-    
-            if ($response->successful()) {
-                return response()->json(['success' => true]);
-            } else {
-                Log::error('Error upscaling image', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
-                ]);
-                return response()->json(['success' => false, 'error' => 'Failed to upscale image.']);
-            }
-        } catch (\Exception $e) {
-            Log::error('Exception during image upscaling', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-            return response()->json(['success' => false, 'error' => $e->getMessage()]);
+            return response()->json(['success' => false, 'error' => 'Failed to upscale image.']);
         }
+    } catch (\Exception $e) {
+        Log::error('Exception during image upscaling', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        return response()->json(['success' => false, 'error' => $e->getMessage()]);
     }
+}
+
     
     
 

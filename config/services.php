@@ -36,7 +36,7 @@ return [
 ],
 
 'midjourney' => [
-    'api_key' => env('MIDJOURNEY_API_KEY'),
+    'api_key' => env('MIDJOURNEY_API_TOKEN'),
 ],
 
 ];
