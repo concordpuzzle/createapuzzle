@@ -284,7 +284,6 @@ public function createProduct(Request $request)
 
         $image = CPImageGeneration::findOrFail($request->input('image_id'));
 
-        // Assume you have a method to create a product in WooCommerce
         try {
             $woocommerce = new WooCommerceClient(
                 env('WOOCOMMERCE_STORE_URL'),
@@ -299,6 +298,10 @@ public function createProduct(Request $request)
                         CURLOPT_SSL_VERIFYHOST => false,
                         CURLOPT_SSL_VERIFYPEER => false,
                         CURLOPT_VERBOSE => true,
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_HEADER => true,
+                        CURLOPT_FOLLOWLOCATION => true,
+                        CURLOPT_TIMEOUT => 30,
                     ],
                 ]
             );
@@ -318,8 +321,10 @@ public function createProduct(Request $request)
             $product = $woocommerce->post('products', $data);
 
             if ($product) {
+                Log::info('Product created successfully', ['product' => $product]);
                 return redirect()->route('cp_image_generation.index')->with('success', 'Product created successfully.');
             } else {
+                Log::error('Failed to create product', ['response' => $product]);
                 return redirect()->back()->with('error', 'Failed to create product.');
             }
         } catch (\Exception $e) {
