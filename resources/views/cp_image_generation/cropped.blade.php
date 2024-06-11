@@ -9,10 +9,10 @@
             <form method="POST" action="{{ route('cp_image_generation.create_product') }}">
                 @csrf
                 <div class="form-group">
-                    <input type="text" class="form-control" id="title" name="title" placeholder="Title" value="{{ old('title') }}" required>
+                    <input type="text" class="form-control sleek-input" id="title" name="title" placeholder="Title" value="{{ old('title') }}" required>
                 </div>
                 <div class="form-group">
-                    <textarea class="form-control" id="description" name="description" rows="3" placeholder="Description" required>{{ old('description') }}</textarea>
+                    <textarea class="form-control sleek-input" id="description" name="description" rows="3" placeholder="Description" required>{{ old('description') }}</textarea>
                 </div>
                 <input type="hidden" name="image_id" value="{{ $image->id }}">
                 <button type="submit" class="btn btn-primary">Create Puzzle</button>
@@ -20,4 +20,13 @@
         </div>
     </div>
 </div>
+
+<style>
+    .sleek-input {
+        margin-top: 15px;
+        border: none;
+        border-radius: 3px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+</style>
 @endsection
