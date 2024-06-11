@@ -51,42 +51,52 @@ class CPImageGenerationController extends Controller
     }
 
     public function crop(Request $request)
-    {
-        Log::info('Cropping image request received', ['request' => $request->all()]);
-    
-        $request->validate([
-            'cropped_image' => 'required|image',
+{
+    Log::info('Cropping image request received', ['request' => $request->all()]);
+
+    $request->validate([
+        'cropped_image' => 'required|image',
+    ]);
+
+    try {
+        $croppedImage = $request->file('cropped_image');
+        Log::info('Cropped image file details', ['file' => $croppedImage]);
+
+        $path = $croppedImage->store('public/generated_images');
+        Log::info('Cropped image saved successfully', ['path' => $path]);
+
+        // Remove 'public/' from the path before storing in the database
+        $storedPath = str_replace('public/', '', $path);
+
+        // Save cropped image information to database
+        $image = CPImageGeneration::create([
+            'prompt' => 'Cropped Image',
+            'generated_image' => $storedPath,
         ]);
-    
-        try {
-            $croppedImage = $request->file('cropped_image');
-            Log::info('Cropped image file details', ['file' => $croppedImage]);
-    
-            $path = $croppedImage->store('public/generated_images');
-            Log::info('Cropped image saved successfully', ['path' => $path]);
-    
-            // Save cropped image information to database
-            $image = CPImageGeneration::create([
-                'prompt' => 'Cropped Image',
-                'generated_image' => $path,
-            ]);
-    
-            // Generate AI title and description
-            $aiResponse = $this->generateTitleAndDescription($path);
-            $title = $aiResponse['title'];
-            $description = $aiResponse['description'];
-    
-            return response()->json(['success' => true, 'id' => $image->id, 'path' => Storage::url($path), 'title' => $title, 'description' => $description]);
-        } catch (\Exception $e) {
-            Log::error('Error during image cropping', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-            ]);
-            return response()->json(['success' => false, 'error' => $e->getMessage()]);
-        }
+
+        // Generate AI title and description
+        $aiResponse = $this->generateTitleAndDescription($path);
+        $title = $aiResponse['title'];
+        $description = $aiResponse['description'];
+
+        return response()->json([
+            'success' => true,
+            'id' => $image->id,
+            'path' => Storage::url($storedPath),
+            'title' => $title,
+            'description' => $description,
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error during image cropping', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ]);
+        return response()->json(['success' => false, 'error' => $e->getMessage()]);
     }
+}
+
     
 
     public function showCropped($id)
@@ -149,70 +159,71 @@ class CPImageGenerationController extends Controller
     }
 
     public function createProduct(Request $request)
-    {
-        $request->validate([
-            'image_id' => 'required|integer',
-        ]);
-    
-        $image = CPImageGeneration::findOrFail($request->image_id);
-    
-        try {
-            $woocommerce = new Client(
-                env('WOOCOMMERCE_SITE_URL'),
-                env('WOOCOMMERCE_CONSUMER_KEY'),
-                env('WOOCOMMERCE_CONSUMER_SECRET'),
+{
+    $request->validate([
+        'image_id' => 'required|integer',
+    ]);
+
+    $image = CPImageGeneration::findOrFail($request->image_id);
+
+    try {
+        $woocommerce = new Client(
+            env('WOOCOMMERCE_SITE_URL'),
+            env('WOOCOMMERCE_CONSUMER_KEY'),
+            env('WOOCOMMERCE_CONSUMER_SECRET'),
+            [
+                'wp_api' => true,
+                'version' => 'wc/v3',
+                'verify_ssl' => false, // Disable SSL verification for testing
+            ]
+        );
+
+        // Generate the correct URL for the image
+        $imageUrl = asset('storage/' . $image->generated_image);
+
+        $data = [
+            'name' => 'Custom Puzzle - ' . $image->prompt,
+            'type' => 'simple',
+            'regular_price' => '19.99',
+            'description' => 'A custom puzzle generated from your image prompt.',
+            'images' => [
                 [
-                    'wp_api' => true,
-                    'version' => 'wc/v3',
-                    'verify_ssl' => false, // Disable SSL verification for testing
-                ]
-            );
-    
-            // Generate the correct URL for the image
-            $imageUrl = asset('storage/' . $image->generated_image);
-    
-            $data = [
-                'name' => 'Custom Puzzle - ' . $image->prompt,
-                'type' => 'simple',
-                'regular_price' => '19.99',
-                'description' => 'A custom puzzle generated from your image prompt.',
-                'images' => [
-                    [
-                        'src' => $imageUrl,
-                        'alt' => $image->prompt,
-                    ],
+                    'src' => $imageUrl,
+                    'alt' => $image->prompt,
                 ],
-                'categories' => [
-                    [
-                        'id' => 1, // Replace with your actual category ID
-                    ],
+            ],
+            'categories' => [
+                [
+                    'id' => 1, // Replace with your actual category ID
                 ],
-            ];
-    
-            $product = $woocommerce->post('products', $data);
-    
-            return response()->json([
-                'success' => true,
-                'product' => $product,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error creating WooCommerce product', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-            ]);
-    
-            if ($e instanceof \Automattic\WooCommerce\HttpClient\HttpClientException) {
-                $request = $e->getRequest();
-                $response = $e->getResponse();
-                Log::error('Request', ['request' => $request]);
-                Log::error('Response', ['response' => $response]);
-            }
-    
-            return response()->json(['success' => false, 'error' => 'cURL Error: ' . $e->getMessage()]);
+            ],
+        ];
+
+        $product = $woocommerce->post('products', $data);
+
+        return response()->json([
+            'success' => true,
+            'product' => $product,
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error creating WooCommerce product', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ]);
+
+        if ($e instanceof \Automattic\WooCommerce\HttpClient\HttpClientException) {
+            $request = $e->getRequest();
+            $response = $e->getResponse();
+            Log::error('Request', ['request' => $request]);
+            Log::error('Response', ['response' => $response]);
         }
+
+        return response()->json(['success' => false, 'error' => 'cURL Error: ' . $e->getMessage()]);
     }
+}
+
     
     
     
