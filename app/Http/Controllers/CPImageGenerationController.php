@@ -275,63 +275,49 @@ public function showCropped($id)
 }
   
 public function createProduct(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'image_id' => 'required|exists:c_p_image_generations,id',
+{
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'required|string',
+        'image_id' => 'required|integer|exists:c_p_image_generations,id',
+    ]);
+
+    $image = CPImageGeneration::findOrFail($request->input('image_id'));
+
+    try {
+        $woocommerce = new Client(
+            env('WOOCOMMERCE_STORE_URL'),
+            env('WOOCOMMERCE_CONSUMER_KEY'),
+            env('WOOCOMMERCE_CONSUMER_SECRET'),
+            [
+                'version' => 'wc/v3',
+            ]
+        );
+
+        $data = [
+            'name' => $request->input('title'),
+            'type' => 'simple',
+            'regular_price' => '19.99',
+            'description' => $request->input('description'),
+            'images' => [
+                [
+                    'src' => Storage::url($image->generated_image),
+                ],
+            ],
+        ];
+
+        $product = $woocommerce->post('products', $data);
+
+        return redirect()->route('cp_image_generation.index')->with('success', 'Product created successfully.');
+    } catch (\Exception $e) {
+        Log::error('Error creating product', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
         ]);
 
-        $image = CPImageGeneration::findOrFail($request->input('image_id'));
-
-        try {
-            $woocommerce = new WooCommerceClient(
-                env('WOOCOMMERCE_STORE_URL'),
-                env('WOOCOMMERCE_CONSUMER_KEY'),
-                env('WOOCOMMERCE_CONSUMER_SECRET'),
-                [
-                    'version' => 'wc/v3',
-                    'wp_api' => true,
-                    'verify_ssl' => false,
-                    'query_string_auth' => true,
-                    'curl.options' => [
-                        CURLOPT_SSL_VERIFYHOST => false,
-                        CURLOPT_SSL_VERIFYPEER => false,
-                        CURLOPT_VERBOSE => true,
-                        CURLOPT_RETURNTRANSFER => true,
-                        CURLOPT_HEADER => true,
-                        CURLOPT_FOLLOWLOCATION => true,
-                        CURLOPT_TIMEOUT => 30,
-                    ],
-                ]
-            );
-
-            $data = [
-                'name' => $request->input('title'),
-                'type' => 'simple',
-                'regular_price' => '19.99', // Example price, you can make this dynamic
-                'description' => $request->input('description'),
-                'images' => [
-                    [
-                        'src' => Storage::url($image->generated_image),
-                    ],
-                ],
-            ];
-
-            $product = $woocommerce->post('products', $data);
-
-            if ($product) {
-                Log::info('Product created successfully', ['product' => $product]);
-                return redirect()->route('cp_image_generation.index')->with('success', 'Product created successfully.');
-            } else {
-                Log::error('Failed to create product', ['response' => $product]);
-                return redirect()->back()->with('error', 'Failed to create product.');
-            }
-        } catch (\Exception $e) {
-            Log::error('Error creating product', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            return redirect()->back()->with('error', 'Failed to create product.');
-        }
+        return redirect()->route('cp_image_generation.index')->with('error', 'Failed to create product.');
     }
+}
     
     public function crop(Request $request)
     {
