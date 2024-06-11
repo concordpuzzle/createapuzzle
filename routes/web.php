@@ -24,6 +24,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::get('/dashboard', [CPImageGenerationController::class, 'index'])->name('dashboard');
         Route::get('/published-puzzles', [CPImageGenerationController::class, 'publishedPuzzles'])->name('published_puzzles');
         // CPImageGeneration routes
+        Route::get('/puzzle-feed', [CPImageGenerationController::class, 'puzzleFeed'])->name('puzzle_feed');
+
 Route::get('/cp-image-generation', [CPImageGenerationController::class, 'index'])->name('cp_image_generation.index');
 Route::post('/cp-image-generation', [CPImageGenerationController::class, 'store'])->name('cp_image_generation.store');
 

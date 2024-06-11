@@ -353,6 +353,14 @@ public function createProduct(Request $request)
         return back()->with('error', $error);
     }
 }
+
+public function puzzleFeed()
+{
+    $publishedProducts = PublishedProduct::all();
+    return view('cp_image_generation.puzzle_feed', compact('publishedProducts'));
+}
+
+
 public function crop(Request $request)
     {
         Log::info('Cropping image request received', ['request' => $request->all()]);
