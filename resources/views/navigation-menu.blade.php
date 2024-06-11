@@ -15,6 +15,9 @@
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                         {{ __('Create') }}
                     </x-nav-link>
+                    <x-nav-link href="{{ route('published_puzzles') }}" :active="request()->routeIs('published_puzzles')">
+                        {{ __('My Puzzles') }}
+                    </x-nav-link>
                 </div>
             </div>
 
