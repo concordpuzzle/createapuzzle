@@ -49,13 +49,13 @@
     <form method="POST" action="{{ route('cp_image_generation.store') }}" enctype="multipart/form-data" class="mb-4">
         @csrf
         <div class="form-group">
+            <label for="prompt" class="radio-canada-big">Generate custom puzzle picture options with a prompt.</label>
+            <input type="text" class="form-control radio-canada-big prompt-input" id="prompt" name="prompt" placeholder="Enter your image prompt" required>
             <div class="mb-3">
                 <button type="button" class="btn append-button radio-canada-big" onclick="appendText('photorealistic')">📸 Photorealistic</button>
                 <button type="button" class="btn append-button radio-canada-big" onclick="appendText('illustration')">🖌️ Illustration</button>
                 <button type="button" class="btn append-button radio-canada-big" onclick="appendText('painting')">🎨 Painting</button>
             </div>
-            <label for="prompt" class="radio-canada-big">Generate custom puzzle picture options with a prompt.</label>
-            <input type="text" class="form-control radio-canada-big prompt-input" id="prompt" name="prompt" placeholder="Enter your image prompt" required>
         </div>
         <button type="submit" class="btn create-button radio-canada-big">Create Puzzle Pictures</button>
     </form>
