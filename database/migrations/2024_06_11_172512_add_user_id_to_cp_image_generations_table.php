@@ -11,9 +11,14 @@ class AddUserIdToCpImageGenerationsTable extends Migration
         Schema::table('c_p_image_generations', function (Blueprint $table) {
             if (!Schema::hasColumn('c_p_image_generations', 'user_id')) {
                 $table->unsignedBigInteger('user_id')->nullable()->after('id');
+            } else {
+                $table->unsignedBigInteger('user_id')->nullable()->change();
             }
-            $table->unsignedBigInteger('user_id')->nullable(false)->change();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            
+            $table->foreign('user_id')
+                  ->references('id')
+                  ->on('users')
+                  ->onDelete('cascade');
         });
     }
 
