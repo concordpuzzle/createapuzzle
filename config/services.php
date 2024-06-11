@@ -32,7 +32,7 @@ return [
     ],
 // config/services.php
 'openai' => [
-    'key' => env('sk-proj-au0TTX2UgCIGz1k6QXX0T3BlbkFJAAyYFjeHxIJ6vuAKEYDf'),
+    'key' => env('OPENAI_API_KEY'),
 ],
 
 
