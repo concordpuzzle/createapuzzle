@@ -292,6 +292,14 @@ public function createProduct(Request $request)
                 env('WOOCOMMERCE_CONSUMER_SECRET'),
                 [
                     'version' => 'wc/v3',
+                    'wp_api' => true,
+                    'verify_ssl' => false,
+                    'query_string_auth' => true,
+                    'curl.options' => [
+                        CURLOPT_SSL_VERIFYHOST => false,
+                        CURLOPT_SSL_VERIFYPEER => false,
+                        CURLOPT_VERBOSE => true,
+                    ],
                 ]
             );
 
@@ -319,7 +327,7 @@ public function createProduct(Request $request)
             return redirect()->back()->with('error', 'Failed to create product.');
         }
     }
-
+    
     public function crop(Request $request)
     {
         Log::info('Cropping image request received', ['request' => $request->all()]);
