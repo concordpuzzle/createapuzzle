@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Automattic\WooCommerce\Client;
 use Automattic\WooCommerce\HttpClient\HttpClientException;
+use App\Models\PublishedProduct; // Add this at the top of your controller
+
 
 
 class CPImageGenerationController extends Controller
@@ -25,6 +27,21 @@ class CPImageGenerationController extends Controller
 
         return view('cp_image_generation.index', compact('images'));
     }
+
+
+    // app/Http/Controllers/CPImageGenerationController.php
+
+public function publishedPuzzles()
+{
+    $userId = auth()->user()->id;
+    $publishedProducts = PublishedProduct::where('user_id', $userId)
+                            ->orderBy('created_at', 'desc')
+                            ->get();
+
+    return view('cp_image_generation.published_puzzles', compact('publishedProducts'));
+}
+
+
 
     public function store(Request $request)
     {
@@ -280,52 +297,62 @@ public function showCropped($id)
     $image = CPImageGeneration::findOrFail($id);
     return view('cp_image_generation.cropped', compact('image'));
 }
- 
 public function createProduct(Request $request)
-    {
-        $image = CPImageGeneration::findOrFail($request->input('image_id'));
+{
+    $image = CPImageGeneration::findOrFail($request->input('image_id'));
+    $user = auth()->user();
 
-        try {
-            $woocommerce = new Client(
-                env('WOOCOMMERCE_STORE_URL'),
-                env('WOOCOMMERCE_CONSUMER_KEY'),
-                env('WOOCOMMERCE_CONSUMER_SECRET'),
+    try {
+        $woocommerce = new Client(
+            env('WOOCOMMERCE_STORE_URL'),
+            env('WOOCOMMERCE_CONSUMER_KEY'),
+            env('WOOCOMMERCE_CONSUMER_SECRET'),
+            [
+                'version' => 'wc/v3',
+            ]
+        );
+
+        $relativeUrl = Storage::url($image->generated_image);
+        $publicUrl = url($relativeUrl);
+
+        // Log the public URL for debugging
+        Log::info("Public URL: " . $publicUrl);
+
+        $data = [
+            'name' => $request->input('title'),
+            'description' => $request->input('description'),
+            'images' => [
                 [
-                    'version' => 'wc/v3',
+                    'src' => $publicUrl
                 ]
-            );
+            ],
+            'type' => 'simple',
+            'regular_price' => '19.99',
+        ];
 
-            $relativeUrl = Storage::url($image->generated_image);
-            $publicUrl = url($relativeUrl);
+        $product = $woocommerce->post('products', $data);
 
-            // Log the public URL for debugging
-            Log::info("Public URL: " . $publicUrl);
+        // Save the product information to the database
+        PublishedProduct::create([
+            'image_id' => $image->id,
+            'user_id' => $user->id,
+            'title' => $request->input('title'),
+            'description' => $request->input('description'),
+            'product_id' => $product->id,
+            'product_url' => $product->permalink,
+            'cropped_image' => $image->generated_image, // Assuming the cropped image is stored here
+        ]);
 
-            $data = [
-                'name' => $request->input('title'),
-                'description' => $request->input('description'),
-                'images' => [
-                    [
-                        'src' => $publicUrl
-                    ]
-                ],
-                'type' => 'simple',
-                'regular_price' => '19.99',
-            ];
+        // Get the product URL
+        $productUrl = $product->permalink;
+        return redirect($productUrl);
 
-            $product = $woocommerce->post('products', $data);
-
-            // Get the product URL
-            $productUrl = $product->permalink;
-            return redirect($productUrl);
-
-        } catch (HttpClientException $e) {
-            $error = $e->getMessage();
-            Log::error("Error creating product: cURL Error: $error");
-            return back()->with('error', $error);
-        }
+    } catch (HttpClientException $e) {
+        $error = $e->getMessage();
+        Log::error("Error creating product: cURL Error: $error");
+        return back()->with('error', $error);
     }
-
+}
 public function crop(Request $request)
     {
         Log::info('Cropping image request received', ['request' => $request->all()]);

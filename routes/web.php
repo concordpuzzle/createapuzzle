@@ -19,19 +19,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
-    Route::get('/dashboard', [CPImageGenerationController::class, 'index'])->name('dashboard');
-});
-
-// Staging routes
-Route::get('/staging', [ImageGenerationController::class, 'index'])->name('staging.index');
-Route::post('/staging/generate', [ImageGenerationController::class, 'generate'])->name('staging.generate');
-
-// CPImageGeneration routes
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])
+    ->group(function () {
+        Route::get('/dashboard', [CPImageGenerationController::class, 'index'])->name('dashboard');
+        Route::get('/published-puzzles', [CPImageGenerationController::class, 'publishedPuzzles'])->name('published_puzzles');
+        // CPImageGeneration routes
 Route::get('/cp-image-generation', [CPImageGenerationController::class, 'index'])->name('cp_image_generation.index');
 Route::post('/cp-image-generation', [CPImageGenerationController::class, 'store'])->name('cp_image_generation.store');
 
@@ -41,3 +33,9 @@ Route::post('/cp-image-generation/create-product', [CPImageGenerationController:
 Route::post('/cp-image-generation/upscale', [CPImageGenerationController::class, 'upscale'])->name('cp_image_generation.upscale');
 Route::get('/cp-image-generation/upscaled', [CPImageGenerationController::class, 'showUpscaledImage'])->name('cp_image_generation.upscaled');
 Route::get('cp-image-generation/upscaled/{id}', [CPImageGenerationController::class, 'showUpscaled'])->name('cp_image_generation.upscaled');
+    });
+
+// Staging routes
+Route::get('/staging', [ImageGenerationController::class, 'index'])->name('staging.index');
+Route::post('/staging/generate', [ImageGenerationController::class, 'generate'])->name('staging.generate');
+
