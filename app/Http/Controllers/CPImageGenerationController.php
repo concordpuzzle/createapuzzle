@@ -51,52 +51,42 @@ class CPImageGenerationController extends Controller
     }
 
     public function crop(Request $request)
-{
-    Log::info('Cropping image request received', ['request' => $request->all()]);
-
-    $request->validate([
-        'cropped_image' => 'required|image',
-    ]);
-
-    try {
-        $croppedImage = $request->file('cropped_image');
-        Log::info('Cropped image file details', ['file' => $croppedImage]);
-
-        $path = $croppedImage->store('public/generated_images');
-        Log::info('Cropped image saved successfully', ['path' => $path]);
-
-        // Remove 'public/' from the path before storing in the database
-        $storedPath = str_replace('public/', '', $path);
-
-        // Save cropped image information to database
-        $image = CPImageGeneration::create([
-            'prompt' => 'Cropped Image',
-            'generated_image' => $storedPath,
+    {
+        Log::info('Cropping image request received', ['request' => $request->all()]);
+    
+        $request->validate([
+            'cropped_image' => 'required|image',
         ]);
-
-        // Generate AI title and description
-        $aiResponse = $this->generateTitleAndDescription($path);
-        $title = $aiResponse['title'];
-        $description = $aiResponse['description'];
-
-        return response()->json([
-            'success' => true,
-            'id' => $image->id,
-            'path' => Storage::url($storedPath),
-            'title' => $title,
-            'description' => $description,
-        ]);
-    } catch (\Exception $e) {
-        Log::error('Error during image cropping', [
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-        ]);
-        return response()->json(['success' => false, 'error' => $e->getMessage()]);
+    
+        try {
+            $croppedImage = $request->file('cropped_image');
+            Log::info('Cropped image file details', ['file' => $croppedImage]);
+    
+            $path = $croppedImage->store('public/generated_images');
+            Log::info('Cropped image saved successfully', ['path' => $path]);
+    
+            // Save cropped image information to database
+            $image = CPImageGeneration::create([
+                'prompt' => 'Cropped Image',
+                'generated_image' => $path,
+            ]);
+    
+            // Generate AI title and description
+            $aiResponse = $this->generateTitleAndDescription($path);
+            $title = $aiResponse['title'];
+            $description = $aiResponse['description'];
+    
+            return response()->json(['success' => true, 'id' => $image->id, 'path' => Storage::url($path), 'title' => $title, 'description' => $description]);
+        } catch (\Exception $e) {
+            Log::error('Error during image cropping', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            return response()->json(['success' => false, 'error' => $e->getMessage()]);
+        }
     }
-}
-
     
 
     public function showCropped($id)
@@ -158,7 +148,7 @@ class CPImageGenerationController extends Controller
         return $name;
     }
 
-    public function createProduct(Request $request)
+public function createProduct(Request $request)
 {
     $request->validate([
         'image_id' => 'required|integer',
@@ -224,7 +214,6 @@ class CPImageGenerationController extends Controller
     }
 }
 
-    
     
     
 
