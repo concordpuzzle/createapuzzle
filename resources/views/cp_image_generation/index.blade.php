@@ -67,50 +67,82 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <script>
-    let cropper;
-    
-    function openCropModal(imageUrl) {
-        $('#imageToCrop').attr('src', imageUrl);
-        $('#cropModal').modal('show');
-        
-        $('#cropModal').on('shown.bs.modal', function () {
-            cropper = new Cropper(document.getElementById('imageToCrop'), {
-                aspectRatio: 16 / 9,  // Change to your desired ratio
-                viewMode: 1
-            });
-        }).on('hidden.bs.modal', function () {
-            cropper.destroy();
-            cropper = null;
-        });
-    }
+let cropper;
 
-    $('#cropButton').on('click', function() {
-        cropImage();
+function openCropModal(imageUrl) {
+    console.log('Opening crop modal with image URL:', imageUrl); // Log the image URL
+    $('#imageToCrop').attr('src', imageUrl);
+    $('#cropModal').modal('show');
+
+    $('#cropModal').on('shown.bs.modal', function () {
+        console.log('Initializing Cropper.js');
+        cropper = new Cropper(document.getElementById('imageToCrop'), {
+            aspectRatio: 16 / 9,  // Change to your desired ratio
+            viewMode: 1
+        });
+    }).on('hidden.bs.modal', function () {
+        console.log('Destroying Cropper.js instance');
+        cropper.destroy();
+        cropper = null;
     });
+}
 
-    function cropImage() {
-        const canvas = cropper.getCroppedCanvas();
-        
-        canvas.toBlob(function(blob) {
-            const formData = new FormData();
-            formData.append('cropped_image', blob, 'cropped.png');
+$('#cropButton').on('click', function() {
+    console.log('Crop button clicked');
+    cropImage();
+});
 
-            fetch('{{ route('cp_image_generation.crop') }}', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();  // Reload the page to show the cropped image
-                } else {
-                    alert('Crop failed');
-                }
-            });
-        });
+function cropImage() {
+    if (!cropper) {
+        console.error('Cropper.js instance is not initialized');
+        return;
     }
+    
+    const canvas = cropper.getCroppedCanvas();
+    if (!canvas) {
+        console.error('Failed to get cropped canvas');
+        return;
+    }
+    
+    console.log('Canvas cropped, converting to blob...');
+    canvas.toBlob(function(blob) {
+        if (!blob) {
+            console.error('Failed to convert canvas to blob');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('cropped_image', blob, 'cropped.png');
+        console.log('Blob created, sending to server...');
+
+        fetch('{{ route('cp_image_generation.crop') }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Server response:', data);
+            if (data.success) {
+                location.reload();  // Reload the page to show the cropped image
+            } else {
+                alert('Crop failed');
+                console.error('Crop failed:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error during fetch:', error);
+            alert('An error occurred during the cropping process');
+        });
+    }, 'image/png');
+}
+
 </script>
 @endsection
