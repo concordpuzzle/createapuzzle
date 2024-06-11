@@ -290,7 +290,8 @@ public function createProduct(Request $request)
                 ]
             );
 
-            $publicUrl = Storage::url($image->generated_image);
+            $relativeUrl = Storage::url($image->generated_image);
+            $publicUrl = url($relativeUrl);
 
             // Log the public URL for debugging
             Log::info("Public URL: " . $publicUrl);
@@ -316,6 +317,7 @@ public function createProduct(Request $request)
             return response()->json(['success' => false, 'error' => $error]);
         }
     }
+    
 public function crop(Request $request)
     {
         Log::info('Cropping image request received', ['request' => $request->all()]);
