@@ -93,7 +93,7 @@
                                     <i class="fa-solid fa-pencil" style="color:#fff;font-size:22px;"></i>
                                 </div>
 
-                                <h2 class="mt-6 text-xl font-semibold text-gray-900">Browse <u>Community-Made</u> Puzzles</h2>
+                                <h2 class="mt-6 text-xl font-semibold text-gray-900">Browse <u>Community Made</u> Puzzles</h2>
 
                                 <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
                                 Provide a description or prompt to generate a custom illustration. Our AI will create a unique image based on your input, which you can then turn into a personalized jigsaw puzzle by selecting the number of pieces and other options.                                </p>
