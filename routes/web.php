@@ -38,6 +38,7 @@ Route::post('/staging/generate', [ImageGenerationController::class, 'generate'])
 
 use App\Http\Controllers\CPImageGenerationController;
 
+
 Route::get('/cp-image-generation', [CPImageGenerationController::class, 'index'])->name('cp_image_generation.index');
 Route::post('/cp-image-generation', [CPImageGenerationController::class, 'store'])->name('cp_image_generation.store');
 
