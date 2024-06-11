@@ -21,6 +21,7 @@
     }
     .prompt-input {
         font-size: 33px;
+        text-align: center;
     }
     .append-button {
         font-size: 14px;
@@ -49,13 +50,12 @@
     <form method="POST" action="{{ route('cp_image_generation.store') }}" enctype="multipart/form-data" class="mb-4">
         @csrf
         <div class="form-group">
-            <label style="font-size:22px;" for="prompt" class="radio-canada-big">Generate custom puzzle picture options with a prompt.</label>
-            <input type="text" class="form-control radio-canada-big prompt-input" id="prompt" name="prompt" placeholder="Enter your image prompt" required><br>
             <div class="mb-3">
                 <button type="button" class="btn append-button radio-canada-big" onclick="appendText('photorealistic')">📸 Photorealistic</button>
                 <button type="button" class="btn append-button radio-canada-big" onclick="appendText('illustration')">🖌️ Illustration</button>
                 <button type="button" class="btn append-button radio-canada-big" onclick="appendText('painting')">🎨 Painting</button>
             </div>
+            <input type="text" class="form-control radio-canada-big prompt-input" id="prompt" name="prompt" placeholder="Generate custom puzzle picture options with a prompt." required><br>
         </div>
         <button type="submit" class="btn create-button radio-canada-big">Create Puzzle Pictures</button>
     </form>
@@ -98,7 +98,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <script>
     let imageId;
     let messageId;
