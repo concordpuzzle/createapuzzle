@@ -273,7 +273,52 @@ public function showCropped($id)
     $image = CPImageGeneration::findOrFail($id);
     return view('cp_image_generation.cropped', compact('image'));
 }
-    
+  
+public function createProduct(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'image_id' => 'required|exists:c_p_image_generations,id',
+        ]);
+
+        $image = CPImageGeneration::findOrFail($request->input('image_id'));
+
+        // Assume you have a method to create a product in WooCommerce
+        try {
+            $woocommerce = new WooCommerceClient(
+                env('WOOCOMMERCE_STORE_URL'),
+                env('WOOCOMMERCE_CONSUMER_KEY'),
+                env('WOOCOMMERCE_CONSUMER_SECRET'),
+                [
+                    'version' => 'wc/v3',
+                ]
+            );
+
+            $data = [
+                'name' => $request->input('title'),
+                'type' => 'simple',
+                'regular_price' => '19.99', // Example price, you can make this dynamic
+                'description' => $request->input('description'),
+                'images' => [
+                    [
+                        'src' => Storage::url($image->generated_image),
+                    ],
+                ],
+            ];
+
+            $product = $woocommerce->post('products', $data);
+
+            if ($product) {
+                return redirect()->route('cp_image_generation.index')->with('success', 'Product created successfully.');
+            } else {
+                return redirect()->back()->with('error', 'Failed to create product.');
+            }
+        } catch (\Exception $e) {
+            Log::error('Error creating product', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return redirect()->back()->with('error', 'Failed to create product.');
+        }
+    }
 
     public function crop(Request $request)
     {
