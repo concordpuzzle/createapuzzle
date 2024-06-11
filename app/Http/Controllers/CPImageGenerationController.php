@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Http;
 use App\Models\CPImageGeneration;
 use Automattic\WooCommerce\Client;
 
+
 class CPImageGenerationController extends Controller
 {
     // Display the form and the list of generated images
@@ -148,50 +149,58 @@ class CPImageGenerationController extends Controller
     }
 
     public function createProduct(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'image_id' => 'required|exists:c_p_image_generations,id',
+{
+    $request->validate([
+        'image_id' => 'required|integer',
+    ]);
+
+    $image = CPImageGeneration::findOrFail($request->image_id);
+
+    try {
+        $woocommerce = new Client(
+            env('WOOCOMMERCE_SITE_URL'),
+            env('WOOCOMMERCE_CONSUMER_KEY'),
+            env('WOOCOMMERCE_CONSUMER_SECRET'),
+            [
+                'wp_api' => true,
+                'version' => 'wc/v3',
+            ]
+        );
+
+        $data = [
+            'name' => 'Custom Puzzle - ' . $image->prompt,
+            'type' => 'simple',
+            'regular_price' => '19.99',
+            'description' => 'A custom puzzle generated from your image prompt.',
+            'images' => [
+                [
+                    'src' => url('storage/'.$image->generated_image),
+                    'alt' => $image->prompt,
+                ],
+            ],
+            'categories' => [
+                [
+                    'id' => 1, // Replace with your actual category ID
+                ],
+            ],
+        ];
+
+        $product = $woocommerce->post('products', $data);
+
+        return response()->json([
+            'success' => true,
+            'product' => $product,
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error creating WooCommerce product', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
         ]);
 
-        $image = CPImageGeneration::findOrFail($request->image_id);
-
-        try {
-            $woocommerce = new Client(
-                env('WOOCOMMERCE_SITE_URL'),
-                env('WOOCOMMERCE_CONSUMER_KEY'),
-                env('WOOCOMMERCE_CONSUMER_SECRET'),
-                [
-                    'wp_api' => true,
-                    'version' => 'wc/v3',
-                ]
-            );
-
-            $productData = [
-                'name' => $request->title,
-                'type' => 'simple',
-                'regular_price' => '19.99',
-                'description' => $request->description,
-                'images' => [
-                    [
-                        'src' => Storage::url($image->generated_image),
-                    ],
-                ],
-                'categories' => [
-                    [
-                        'id' => 123,  // Replace with your specific category ID
-                    ],
-                ],
-            ];
-
-            $product = $woocommerce->post('products', $productData);
-            Log::info('Product created successfully in WooCommerce', ['product' => $product]);
-
-            return redirect()->route('cp_image_generation.index')->with('success', 'Puzzle created and added to store successfully');
-        } catch (\Exception $e) {
-            Log::error('Error creating product in WooCommerce', ['error' => $e->getMessage()]);
-            return redirect()->route('cp_image_generation.index')->with('error', 'An error occurred while creating the puzzle');
-        }
+        return response()->json(['success' => false, 'error' => $e->getMessage()]);
     }
+}
+
 }
