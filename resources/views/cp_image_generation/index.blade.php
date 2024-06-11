@@ -35,6 +35,7 @@
                     <div class="card-body">
                         <p class="card-text">{{ $image->prompt }}</p>
                         <button class="btn btn-primary" onclick="openCropModal('{{ Storage::url($image->generated_image) }}', '{{ $image->id }}')">Crop Image</button>
+                        <button class="btn btn-success" onclick="openUpscaleModal('{{ $image->id }}')">Upscale Image</button>
                     </div>
                 </div>
             </div>
@@ -144,6 +145,11 @@
                 alert('Crop failed: ' + error.message);
             });
         });
+    }
+
+    function openUpscaleModal(id) {
+        imageId = id;
+        $('#upscaleModal').modal('show');
     }
 
     function upscaleImage(button) {
