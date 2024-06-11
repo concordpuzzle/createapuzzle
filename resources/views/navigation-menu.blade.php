@@ -15,7 +15,7 @@
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                         {{ __('Create') }}
                     </x-nav-link>
-                    <x-nav-link href="{{ route('cp_image_generation.published_puzzles') }}" :active="request()->routeIs('cp_image_generation.published_puzzles')">
+                    <x-nav-link href="{{ route('cp_image_generation.publishedPuzzles') }}" :active="request()->routeIs('cp_image_generation.publishedPuzzles')">
                         {{ __('My Puzzles') }}
                     </x-nav-link>
                 </div>
