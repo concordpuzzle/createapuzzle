@@ -276,7 +276,6 @@ public function showCropped($id)
     return view('cp_image_generation.cropped', compact('image'));
 }
  
-
 public function createProduct(Request $request)
 {
     $image = CPImageGeneration::findOrFail($request->input('image_id'));
@@ -291,12 +290,17 @@ public function createProduct(Request $request)
             ]
         );
 
+        $publicUrl = Storage::url($image->generated_image);
+
+        // Log the public URL for debugging
+        Log::info("Public URL: " . $publicUrl);
+
         $data = [
             'name' => $request->input('title'),
             'description' => $request->input('description'),
             'images' => [
                 [
-                    'src' => Storage::url($image->generated_image)
+                    'src' => $publicUrl
                 ]
             ],
             'type' => 'simple',
