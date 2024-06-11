@@ -1,6 +1,7 @@
 <?php 
 // app/Http/Controllers/CPImageGenerationController.php
 // app/Http/Controllers/CPImageGenerationController.php
+// app/Http/Controllers/CPImageGenerationController.php
 
 namespace App\Http\Controllers;
 
@@ -27,18 +28,17 @@ class CPImageGenerationController extends Controller
         ]);
 
         $prompt = $request->input('prompt');
-        $imageData = $this->generateImage($prompt);
+        $imageUrl = $this->generateImage($prompt);
 
-        if ($imageData) {
-            $path = 'generated_images/' . uniqid() . '.png';
-            Storage::put($path, $imageData);
+        if ($imageUrl) {
+            $imagePath = $this->saveImageFromUrl($imageUrl);
 
             CPImageGeneration::create([
                 'prompt' => $prompt,
-                'generated_image' => $path,
+                'generated_image' => $imagePath,
             ]);
 
-            Log::info('Image generated and saved successfully', ['path' => $path]);
+            Log::info('Image generated and saved successfully', ['path' => $imagePath]);
 
             return redirect()->route('cp_image_generation.index')->with('success', 'Image generated successfully.');
         } else {
@@ -66,8 +66,8 @@ class CPImageGenerationController extends Controller
         if ($response->successful()) {
             $responseData = $response->json();
 
-            if (isset($responseData['data']) && isset($responseData['data'][0]['image'])) {
-                return base64_decode($responseData['data'][0]['image']);
+            if (isset($responseData['data']) && isset($responseData['data'][0]['url'])) {
+                return $responseData['data'][0]['url'];
             } else {
                 Log::error('OpenAI API response does not contain expected data format', ['response' => $responseData]);
             }
@@ -76,5 +76,16 @@ class CPImageGenerationController extends Controller
         }
 
         return null;
+    }
+
+    private function saveImageFromUrl($url)
+    {
+        $imageContents = file_get_contents($url);
+        $imageName = uniqid() . '.png';
+        $imagePath = 'generated_images/' . $imageName;
+
+        Storage::put($imagePath, $imageContents);
+
+        return $imagePath;
     }
 }
