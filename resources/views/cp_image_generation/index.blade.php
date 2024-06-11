@@ -22,6 +22,12 @@
     .prompt-input {
         font-size: 33px;
     }
+    .append-button {
+        font-size: 14px;
+        background-color: #0c2461;
+        color: white;
+        margin-right: 5px;
+    }
 </style>
 
 <div class="container text-center my-4">
@@ -39,6 +45,11 @@
     <form method="POST" action="{{ route('cp_image_generation.store') }}" enctype="multipart/form-data" class="mb-4">
         @csrf
         <div class="form-group">
+            <div class="mb-3">
+                <button type="button" class="btn append-button radio-canada-big" onclick="appendText('photorealistic')">Photorealistic</button>
+                <button type="button" class="btn append-button radio-canada-big" onclick="appendText('illustration')">Illustration</button>
+                <button type="button" class="btn append-button radio-canada-big" onclick="appendText('painting')">Painting</button>
+            </div>
             <label for="prompt" class="radio-canada-big">Prompt</label>
             <input type="text" class="form-control radio-canada-big prompt-input" id="prompt" name="prompt" placeholder="Enter your image prompt" required>
         </div>
@@ -87,6 +98,11 @@
 <script>
     let imageId;
     let messageId;
+
+    function appendText(text) {
+        const promptInput = document.getElementById('prompt');
+        promptInput.value += ` ${text}`;
+    }
 
     function upscaleImage(imageId, messageId, button) {
         fetch('{{ route('cp_image_generation.upscale') }}', {
