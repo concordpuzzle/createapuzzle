@@ -4,7 +4,7 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
-<div class="container">
+<div class="container text-center">
     <h1>Generate Your Custom Image</h1>
     @if(session('success'))
         <div class="alert alert-success">
@@ -16,7 +16,7 @@
             {{ session('error') }}
         </div>
     @endif
-    <form method="POST" action="{{ route('cp_image_generation.store') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('cp_image_generation.store') }}" enctype="multipart/form-data" class="mb-4">
         @csrf
         <div class="form-group">
             <label for="prompt">Prompt</label>
@@ -26,12 +26,12 @@
     </form>
     <hr>
     <h2>Generated Images</h2>
-    <div class="row">
+    <div class="row justify-content-center">
         @foreach($images as $image)
-            <div class="col-md-4">
+            <div class="col-md-4 d-flex justify-content-center">
                 <div class="card mb-4 shadow-sm">
                     <img src="{{ Storage::url($image->generated_image) }}" class="card-img-top" alt="{{ $image->prompt }}">
-                    <div class="card-body">
+                    <div class="card-body text-center">
                         <p class="card-text">{{ $image->prompt }}</p>
                         <button class="btn btn-primary" onclick="openCropModal('{{ Storage::url($image->generated_image) }}', '{{ $image->id }}')">Crop Image</button>
                         <button class="btn btn-success" onclick="openUpscaleModal('{{ $image->id }}', '{{ $image->midjourney_message_id }}')">Upscale Image</button>

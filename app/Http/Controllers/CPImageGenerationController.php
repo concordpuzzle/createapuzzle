@@ -18,7 +18,11 @@ class CPImageGenerationController extends Controller
 {
     public function index()
     {
-        $images = CPImageGeneration::all();
+        $userId = auth()->user()->id;
+        $images = CPImageGeneration::where('user_id', $userId)
+            ->orderBy('created_at', 'asc')
+            ->get();
+    
         return view('cp_image_generation.index', compact('images'));
     }
 
