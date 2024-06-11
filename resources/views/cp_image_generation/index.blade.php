@@ -28,6 +28,11 @@
         color: white;
         margin-right: 5px;
     }
+    .create-button {
+        font-size: 22px;
+        background-color: #b71540;
+        color: white;
+    }
 </style>
 
 <div class="container text-center my-4">
@@ -46,14 +51,14 @@
         @csrf
         <div class="form-group">
             <div class="mb-3">
-                <button type="button" class="btn append-button radio-canada-big" onclick="appendText('photorealistic')">Photorealistic</button>
-                <button type="button" class="btn append-button radio-canada-big" onclick="appendText('illustration')">Illustration</button>
-                <button type="button" class="btn append-button radio-canada-big" onclick="appendText('painting')">Painting</button>
+                <button type="button" class="btn append-button radio-canada-big" onclick="appendText('photorealistic')">📸 Photorealistic</button>
+                <button type="button" class="btn append-button radio-canada-big" onclick="appendText('illustration')">🖌️ Illustration</button>
+                <button type="button" class="btn append-button radio-canada-big" onclick="appendText('painting')">🎨 Painting</button>
             </div>
             <label for="prompt" class="radio-canada-big">Prompt</label>
             <input type="text" class="form-control radio-canada-big prompt-input" id="prompt" name="prompt" placeholder="Enter your image prompt" required>
         </div>
-        <button type="submit" class="btn btn-primary radio-canada-big" style="background-color: #0c2461; color: white;">Create Pictures</button>
+        <button type="submit" class="btn create-button radio-canada-big">Create Puzzle Pictures</button>
     </form>
     <hr>
     <h2 class="radio-canada-big mb-5" style="font-size: 28px;">Picture Options</h2>
