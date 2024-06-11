@@ -34,7 +34,7 @@
                     <img src="{{ Storage::url($image->generated_image) }}" class="card-img-top" alt="{{ $image->prompt }}">
                     <div class="card-body">
                         <p class="card-text">{{ $image->prompt }}</p>
-                        <button class="btn btn-primary" onclick="openCropModal('{{ Storage::url($image->generated_image) }}')">Crop Image</button>
+                        <button class="btn btn-primary" onclick="openCropModal('{{ Storage::url($image->generated_image) }}', '{{ $image->id }}')">Crop Image</button>
                     </div>
                 </div>
             </div>
@@ -62,6 +62,29 @@
         </div>
     </div>
 
+    <!-- Upscale Modal -->
+    <div id="upscaleModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Select Part to Upscale</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <button class="btn btn-primary" onclick="upscaleImage('U1')">Upscale Top Left (U1)</button>
+                    <button class="btn btn-primary" onclick="upscaleImage('U2')">Upscale Top Right (U2)</button>
+                    <button class="btn btn-primary" onclick="upscaleImage('U3')">Upscale Bottom Left (U3)</button>
+                    <button class="btn btn-primary" onclick="upscaleImage('U4')">Upscale Bottom Right (U4)</button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Canvas to hold cropped image data -->
     <canvas id="croppedCanvas" style="display:none;"></canvas>
 </div>
@@ -71,8 +94,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <script>
     let cropper;
-    function openCropModal(imageUrl) {
+    let imageId;
+    function openCropModal(imageUrl, id) {
         document.getElementById('imageToCrop').src = imageUrl;
+        imageId = id;
         $('#cropModal').modal('show');
         $('#cropModal').on('shown.bs.modal', function () {
             cropper = new Cropper(document.getElementById('imageToCrop'), {
@@ -118,6 +143,32 @@
                 console.error('Error:', error);
                 alert('Crop failed: ' + error.message);
             });
+        });
+    }
+
+    function upscaleImage(button) {
+        fetch('{{ route('cp_image_generation.upscale') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                button: button,
+                image_id: imageId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Upscaling initiated');
+            } else {
+                alert('Upscaling failed: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Upscaling failed: ' + error.message);
         });
     }
 </script>

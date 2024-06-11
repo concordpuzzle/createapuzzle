@@ -134,6 +134,112 @@ class CPImageGenerationController extends Controller
     }
         
 
+    public function upscale(Request $request)
+{
+    $request->validate([
+        'button' => 'required|string|in:U1,U2,U3,U4',
+        'image_id' => 'required|exists:cp_image_generations,id',
+    ]);
+
+    $button = $request->input('button');
+    $image = CPImageGeneration::findOrFail($request->input('image_id'));
+    $messageId = $image->message_id;  // Ensure this is the correct field
+
+    $apiKey = env('MIDJOURNEY_API_TOKEN');
+    $apiUrl = env('MIDJOURNEY_API_URL');
+
+    if (!$apiUrl || !$apiKey) {
+        Log::error('MidJourney API URL or Token is not set', [
+            'apiUrl' => $apiUrl,
+            'apiKey' => $apiKey
+        ]);
+        return response()->json(['success' => false, 'error' => 'MidJourney API URL or Token is not set.']);
+    }
+
+    try {
+        // Send the upscaling request to MidJourney API
+        $upscaleEndpoint = $apiUrl . '/api/v1/midjourney/button';
+        $upscaleResponse = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $apiKey,
+            'Content-Type' => 'application/json'
+        ])->post($upscaleEndpoint, [
+            'messageId' => $messageId,
+            'button' => $button,
+        ]);
+
+        Log::info('Upscale response from MidJourney API', [
+            'status' => $upscaleResponse->status(),
+            'body' => $upscaleResponse->body(),
+        ]);
+
+        if ($upscaleResponse->failed()) {
+            throw new \Exception('Failed to upscale image: ' . $upscaleResponse->body());
+        }
+
+        // Track the progress of the upscaling
+        $upscaleMessageId = $upscaleResponse->json()['messageId'];
+        $upscaleUrl = null;
+        $progressUrl = $apiUrl . '/api/v1/midjourney/message/' . $upscaleMessageId;
+
+        for ($i = 0; $i < 30; $i++) {
+            sleep(10);
+
+            $upscaleProgressResponse = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $apiKey,
+                'Content-Type' => 'application/json'
+            ])->get($progressUrl);
+
+            Log::info('Upscale progress response from MidJourney API', [
+                'status' => $upscaleProgressResponse->status(),
+                'body' => $upscaleProgressResponse->body(),
+            ]);
+
+            $upscaleProgressData = $upscaleProgressResponse->json();
+
+            if (isset($upscaleProgressData['status'])) {
+                if ($upscaleProgressData['status'] === 'DONE' && isset($upscaleProgressData['uri'])) {
+                    $upscaleUrl = $upscaleProgressData['uri'];
+                    break;
+                } elseif ($upscaleProgressData['status'] === 'FAILED') {
+                    throw new \Exception('Upscale failed: ' . $upscaleProgressResponse->body());
+                } elseif ($upscaleProgressData['status'] === 'QUEUED' || $upscaleProgressData['status'] === 'PROCESSING') {
+                    continue; // Continue polling
+                } else {
+                    throw new \Exception('Unexpected response: ' . $upscaleProgressResponse->body());
+                }
+            } else {
+                throw new \Exception('Unexpected response: ' . $upscaleProgressResponse->body());
+            }
+        }
+
+        if (!$upscaleUrl) {
+            throw new \Exception('Failed to get upscaled image URL after polling.');
+        }
+
+        // Store the upscaled image locally
+        $upscaleImageContents = file_get_contents($upscaleUrl);
+        $upscaleImageName = 'generated_images/upscaled_' . uniqid() . '.png';
+        Storage::put('public/' . $upscaleImageName, $upscaleImageContents);
+
+        // Save the upscaled image information to the database
+        $upscaledImage = CPImageGeneration::create([
+            'prompt' => 'Upscaled ' . $button . ' part of ' . $messageId,
+            'generated_image' => $upscaleImageName,
+        ]);
+
+        return response()->json(['success' => true, 'image' => $upscaledImage]);
+    } catch (\Exception $e) {
+        Log::error('Error during upscaling', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ]);
+        return response()->json(['success' => false, 'error' => $e->getMessage()]);
+    }
+}
+
+
     
 
 
