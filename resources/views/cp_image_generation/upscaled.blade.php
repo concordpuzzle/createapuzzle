@@ -16,31 +16,11 @@
             {{ session('error') }}
         </div>
     @endif
+
     <div class="mb-4">
         <img id="imageToCrop" src="{{ Storage::url($image->generated_image) }}" class="img-fluid" alt="Upscaled Image">
     </div>
-    <button class="btn btn-primary" onclick="cropImage()">Crop Image</button>
-
-    <!-- Crop Modal -->
-    <div id="cropModal" class="modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Crop Image</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <img id="imageToCropModal" src="" style="max-width: 100%;">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="submitCroppedImage()">Submit Cropped Image</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <button class="btn btn-primary" onclick="submitCroppedImage()">Submit Cropped Image</button>
 
     <!-- Canvas to hold cropped image data -->
     <canvas id="croppedCanvas" style="display:none;"></canvas>
@@ -52,25 +32,11 @@
 <script>
     let cropper;
 
-    function cropImage() {
+    window.onload = function() {
         const image = document.getElementById('imageToCrop');
-        $('#cropModal').modal('show');
-        $('#cropModal').on('shown.bs.modal', function () {
-            const imageToCropModal = document.getElementById('imageToCropModal');
-            imageToCropModal.src = image.src;
-            cropper = new Cropper(imageToCropModal, {
-                aspectRatio: 1.35 / 1,
-                viewMode: 1
-            });
-            console.log('Cropper initialized');
-        }).on('hidden.bs.modal', function () {
-            if (cropper) {
-                cropper.destroy();
-                cropper = null;
-                console.log('Cropper destroyed');
-            } else {
-                console.log('Cropper not initialized');
-            }
+        cropper = new Cropper(image, {
+            aspectRatio: 1.35 / 1,
+            viewMode: 1
         });
     }
 
