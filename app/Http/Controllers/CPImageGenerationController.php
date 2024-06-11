@@ -164,10 +164,11 @@ class CPImageGenerationController extends Controller
                 [
                     'wp_api' => true,
                     'version' => 'wc/v3',
-                    'verify_ssl' => false, // Disable SSL verification (use only for testing)
+                    'verify_ssl' => false, // Disable SSL verification for testing
                 ]
             );
     
+            // Generate the correct URL for the image
             $imageUrl = asset('storage/' . $image->generated_image);
     
             $data = [
@@ -202,7 +203,6 @@ class CPImageGenerationController extends Controller
                 'line' => $e->getLine(),
             ]);
     
-            // Log cURL specific errors
             if ($e instanceof \Automattic\WooCommerce\HttpClient\HttpClientException) {
                 $request = $e->getRequest();
                 $response = $e->getResponse();
@@ -213,6 +213,7 @@ class CPImageGenerationController extends Controller
             return response()->json(['success' => false, 'error' => 'cURL Error: ' . $e->getMessage()]);
         }
     }
+    
     
     
 
