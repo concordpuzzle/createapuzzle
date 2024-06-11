@@ -19,7 +19,7 @@
                         {{ __('My Puzzles') }}
                     </x-nav-link>
                     <x-nav-link href="{{ route('puzzle_feed') }}" :active="request()->routeIs('puzzle_feed')">
-                        {{ __('Puzzle Feed') }}
+                        {{ __('Community Made Puzzles') }}
                     </x-nav-link>
                 </div>
             </div>
