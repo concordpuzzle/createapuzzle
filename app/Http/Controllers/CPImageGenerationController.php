@@ -17,6 +17,54 @@ use Intervention\Image\ImageManagerStatic as Image;
 
 class CPImageGenerationController extends Controller
 {
+    public function createProduct(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'image_id' => 'required|exists:c_p_image_generations,id',
+        ]);
+    
+        $image = CPImageGeneration::findOrFail($request->image_id);
+    
+        try {
+            $woocommerce = new \Automattic\WooCommerce\Client(
+                env('WOOCOMMERCE_SITE_URL'),
+                env('WOOCOMMERCE_CONSUMER_KEY'),
+                env('WOOCOMMERCE_CONSUMER_SECRET'),
+                [
+                    'wp_api' => true,
+                    'version' => 'wc/v3',
+                ]
+            );
+    
+            $productData = [
+                'name' => $request->title,
+                'type' => 'simple',
+                'regular_price' => '19.99',
+                'description' => $request->description,
+                'images' => [
+                    [
+                        'src' => Storage::url($image->generated_image),
+                    ],
+                ],
+                'categories' => [
+                    [
+                        'id' => 123,  // Replace with your specific category ID
+                    ],
+                ],
+            ];
+    
+            $product = $woocommerce->post('products', $productData);
+            Log::info('Product created successfully in WooCommerce', ['product' => $product]);
+    
+            return redirect()->route('cp_image_generation.index')->with('success', 'Puzzle created and added to store successfully');
+        } catch (\Exception $e) {
+            Log::error('Error creating product in WooCommerce', ['error' => $e->getMessage()]);
+            return redirect()->route('cp_image_generation.index')->with('error', 'An error occurred while creating the puzzle');
+        }
+    }
+    
     public function index()
     {
         $images = CPImageGeneration::all();
@@ -124,52 +172,4 @@ class CPImageGenerationController extends Controller
 
         return $imagePath;
     }
-    public function createProduct(Request $request)
-{
-    $request->validate([
-        'title' => 'required|string|max:255',
-        'description' => 'required|string',
-        'image_id' => 'required|exists:c_p_image_generations,id',
-    ]);
-
-    $image = CPImageGeneration::findOrFail($request->image_id);
-
-    try {
-        $woocommerce = new \Automattic\WooCommerce\Client(
-            env('WOOCOMMERCE_SITE_URL'),
-            env('WOOCOMMERCE_CONSUMER_KEY'),
-            env('WOOCOMMERCE_CONSUMER_SECRET'),
-            [
-                'wp_api' => true,
-                'version' => 'wc/v3',
-            ]
-        );
-
-        $productData = [
-            'name' => $request->title,
-            'type' => 'simple',
-            'regular_price' => '19.99',
-            'description' => $request->description,
-            'images' => [
-                [
-                    'src' => Storage::url($image->generated_image),
-                ],
-            ],
-            'categories' => [
-                [
-                    'id' => 123,  // Replace with your specific category ID
-                ],
-            ],
-        ];
-
-        $product = $woocommerce->post('products', $productData);
-        Log::info('Product created successfully in WooCommerce', ['product' => $product]);
-
-        return redirect()->route('cp_image_generation.index')->with('success', 'Puzzle created and added to store successfully');
-    } catch (\Exception $e) {
-        Log::error('Error creating product in WooCommerce', ['error' => $e->getMessage()]);
-        return redirect()->route('cp_image_generation.index')->with('error', 'An error occurred while creating the puzzle');
-    }
-}
-
 }
