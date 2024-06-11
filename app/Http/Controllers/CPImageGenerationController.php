@@ -19,7 +19,7 @@ class CPImageGenerationController extends Controller
         $images = CPImageGeneration::all();
         return view('cp_image_generation.index', compact('images'));
     }
-    
+
     public function store(Request $request)
     {
         Log::info('Image generation request received', ['request' => $request->all()]);
@@ -30,10 +30,13 @@ class CPImageGenerationController extends Controller
 
         $prompt = $request->input('prompt');
         $apiKey = env('MIDJOURNEY_API_TOKEN');
-        $apiUrl = env('MIDJOURNEY_API_URL') . '/imagine';
+        $apiUrl = env('MIDJOURNEY_API_URL');
 
         if (!$apiUrl || !$apiKey) {
-            Log::error('MidJourney API URL or Token is not set');
+            Log::error('MidJourney API URL or Token is not set', [
+                'apiUrl' => $apiUrl,
+                'apiKey' => $apiKey
+            ]);
             return redirect()->route('cp_image_generation.index')->with('error', 'MidJourney API URL or Token is not set.');
         }
 
@@ -95,7 +98,7 @@ class CPImageGenerationController extends Controller
             return redirect()->route('cp_image_generation.index')->with('error', 'Failed to generate image.');
         }
     }
-
+    
     public function crop(Request $request)
     {
         Log::info('Cropping image request received', ['request' => $request->all()]);
