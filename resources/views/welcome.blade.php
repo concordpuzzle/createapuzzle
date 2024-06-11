@@ -66,7 +66,7 @@
 
             <div class="max-w-7xl mx-auto p-6 lg:p-8">
                 <div class="flex justify-center">
-                     <div style="color:#b71540;font-size:33px;" class="arvo-bold">Make a Puzzle</div>
+                     <div style="color:#b71540;font-size:44px;" class="arvo-bold">Make a Puzzle</div>
                 </div>
 
                 <div class="mt-16">
