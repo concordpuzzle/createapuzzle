@@ -4,24 +4,22 @@
 // app/Http/Controllers/CPImageGenerationController.php
 
 namespace App\Http\Controllers;
+
+use App\Models\CPImageGeneration;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Http;
-use App\Models\CPImageGeneration;
 use Automattic\WooCommerce\Client;
-
 
 class CPImageGenerationController extends Controller
 {
-    // Display the form and the list of generated images
     public function index()
     {
         $images = CPImageGeneration::all();
         return view('cp_image_generation.index', compact('images'));
     }
 
-    // Handle the form submission and generate the image
     public function store(Request $request)
     {
         $request->validate([
@@ -29,54 +27,82 @@ class CPImageGenerationController extends Controller
         ]);
 
         $prompt = $request->input('prompt');
+        $apiKey = env('MIDJOURNEY_API_TOKEN');
+        $apiUrl = env('MIDJOURNEY_API_URL');
 
         try {
-            $imageUrl = $this->generateImage($prompt);
-            if ($imageUrl) {
-                $imagePath = $this->saveImageFromUrl($imageUrl);
-                $image = CPImageGeneration::create([
-                    'prompt' => $prompt,
-                    'generated_image' => $imagePath,
-                ]);
-                Log::info('Image generated and saved successfully', ['path' => $imagePath]);
-                return redirect()->route('cp_image_generation.index')->with('success', 'Image generated successfully');
-            } else {
-                Log::error('Failed to generate image');
-                return redirect()->route('cp_image_generation.index')->with('error', 'Failed to generate image');
+            // Send the prompt to MidJourney API
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $apiKey,
+            ])->post($apiUrl, [
+                'prompt' => $prompt,
+            ]);
+
+            if ($response->failed()) {
+                throw new \Exception('Failed to get a successful response from MidJourney API');
             }
+
+            $imageUrl = $response->json()['image_url'];
+
+            // Store the image locally
+            $imageContents = file_get_contents($imageUrl);
+            $imageName = 'generated_images/' . uniqid() . '.png';
+            Storage::put('public/' . $imageName, $imageContents);
+
+            // Save the image information to the database
+            $image = CPImageGeneration::create([
+                'prompt' => $prompt,
+                'generated_image' => $imageName,
+            ]);
+
+            return redirect()->route('cp_image_generation.index')->with('success', 'Image generated successfully.');
         } catch (\Exception $e) {
-            Log::error('Error during image generation', ['error' => $e->getMessage()]);
-            return redirect()->route('cp_image_generation.index')->with('error', 'An error occurred during image generation');
+            Log::error('Error generating image', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            return redirect()->route('cp_image_generation.index')->with('error', 'Failed to generate image.');
         }
     }
 
     public function crop(Request $request)
     {
         Log::info('Cropping image request received', ['request' => $request->all()]);
-    
+
         $request->validate([
             'cropped_image' => 'required|image',
         ]);
-    
+
         try {
             $croppedImage = $request->file('cropped_image');
             Log::info('Cropped image file details', ['file' => $croppedImage]);
-    
+
             $path = $croppedImage->store('public/generated_images');
             Log::info('Cropped image saved successfully', ['path' => $path]);
-    
+
+            // Remove 'public/' from the path before storing in the database
+            $storedPath = str_replace('public/', '', $path);
+
             // Save cropped image information to database
             $image = CPImageGeneration::create([
                 'prompt' => 'Cropped Image',
-                'generated_image' => $path,
+                'generated_image' => $storedPath,
             ]);
-    
+
             // Generate AI title and description
-            $aiResponse = $this->generateTitleAndDescription($path);
+            $aiResponse = $this->generateTitleAndDescription($storedPath);
             $title = $aiResponse['title'];
             $description = $aiResponse['description'];
-    
-            return response()->json(['success' => true, 'id' => $image->id, 'path' => Storage::url($path), 'title' => $title, 'description' => $description]);
+
+            return response()->json([
+                'success' => true,
+                'id' => $image->id,
+                'path' => Storage::url($storedPath),
+                'title' => $title,
+                'description' => $description,
+            ]);
         } catch (\Exception $e) {
             Log::error('Error during image cropping', [
                 'message' => $e->getMessage(),
@@ -87,136 +113,14 @@ class CPImageGenerationController extends Controller
             return response()->json(['success' => false, 'error' => $e->getMessage()]);
         }
     }
-    
 
-    public function showCropped($id)
+    private function generateTitleAndDescription($imagePath)
     {
-        $image = CPImageGeneration::findOrFail($id);
-        return view('cp_image_generation.cropped', compact('image'));
-    }
-
-    public function generateTitleAndDescription($imagePath)
-    {
-        $apiKey = env('OPENAI_API_KEY');
-        $imageUrl = Storage::url($imagePath);
-
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $apiKey,
-        ])->post('https://api.openai.com/v1/engines/davinci-codex/completions', [
-            'prompt' => "Generate a title and description for this image: $imageUrl",
-            'max_tokens' => 60,
-        ]);
-
-        if ($response->successful()) {
-            $generatedText = $response->json()['choices'][0]['text'];
-            // Split the response into title and description
-            $parts = explode("\n", $generatedText);
-            $title = $parts[0] ?? 'Untitled';
-            $description = $parts[1] ?? 'No description available.';
-
-            return ['title' => $title, 'description' => $description];
-        } else {
-            Log::error('Failed to get a successful response from OpenAI API for title and description', ['response' => $response->body()]);
-            return ['title' => 'Untitled', 'description' => 'No description available.'];
-        }
-    }
-
-    private function generateImage($prompt)
-    {
-        $apiKey = env('OPENAI_API_KEY');
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $apiKey,
-        ])->post('https://api.openai.com/v1/images/generations', [
-            'prompt' => $prompt,
-            'n' => 1,
-            'size' => '1024x1024',
-        ]);
-
-        if ($response->successful()) {
-            return $response->json()['data'][0]['url'];
-        } else {
-            Log::error('Failed to get a successful response from OpenAI API', ['response' => $response->body()]);
-            return null;
-        }
-    }
-
-    private function saveImageFromUrl($url)
-    {
-        $contents = file_get_contents($url);
-        $name = 'generated_images/' . uniqid() . '.png';
-        Storage::put('public/' . $name, $contents);
-        return $name;
-    }
-
-public function createProduct(Request $request)
-{
-    $request->validate([
-        'image_id' => 'required|integer',
-    ]);
-
-    $image = CPImageGeneration::findOrFail($request->image_id);
-
-    try {
-        $woocommerce = new Client(
-            env('WOOCOMMERCE_SITE_URL'),
-            env('WOOCOMMERCE_CONSUMER_KEY'),
-            env('WOOCOMMERCE_CONSUMER_SECRET'),
-            [
-                'wp_api' => true,
-                'version' => 'wc/v3',
-                'verify_ssl' => false, // Disable SSL verification for testing
-            ]
-        );
-
-        $cleanedImagePath = str_replace('public/', '', $image->generated_image);
-
-        // Generate the correct URL for the image
-        $imageUrl = asset('storage/' . $cleanedImagePath);
-
-        $data = [
-            'name' => 'Custom Puzzle - ' . $image->prompt,
-            'type' => 'simple',
-            'regular_price' => '19.99',
-            'description' => 'A custom puzzle generated from your image prompt.',
-            'images' => [
-                [
-                    'src' => $imageUrl,
-                    'alt' => $image->prompt,
-                ],
-            ],
-            'categories' => [
-                [
-                    'id' => 1, // Replace with your actual category ID
-                ],
-            ],
+        // Placeholder function to generate a title and description using AI.
+        // You would replace this with a call to your AI service.
+        return [
+            'title' => 'Generated Title',
+            'description' => 'Generated Description',
         ];
-
-        $product = $woocommerce->post('products', $data);
-
-        return response()->json([
-            'success' => true,
-            'product' => $product,
-        ]);
-    } catch (\Exception $e) {
-        Log::error('Error creating WooCommerce product', [
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-        ]);
-
-        if ($e instanceof \Automattic\WooCommerce\HttpClient\HttpClientException) {
-            $request = $e->getRequest();
-            $response = $e->getResponse();
-            Log::error('Request', ['request' => $request]);
-            Log::error('Response', ['response' => $response]);
-        }
-
-        return response()->json(['success' => false, 'error' => 'cURL Error: ' . $e->getMessage()]);
     }
-}
-
-    
-    
-
 }
