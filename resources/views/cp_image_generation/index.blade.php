@@ -4,6 +4,7 @@
 
 @section('content')
 
+
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
 
 <div class="container">
@@ -66,51 +67,57 @@
     <!-- Canvas to hold cropped image data -->
     <canvas id="croppedCanvas" style="display:none;"></canvas>
 </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-    <script src="{{ mix('js/app.js') }}"></script> <!-- or asset('js/app.js') if not using mix -->
-    @livewireScripts
-    <script>
-        var cropper;
-        function openCropModal(imageUrl) {
-            $('#imageToCrop').attr('src', imageUrl);
-            $('#cropModal').modal('show');
-            $('#cropModal').on('shown.bs.modal', function () {
-                cropper = new Cropper(document.getElementById('imageToCrop'), {
-                    aspectRatio: 16 / 9,  // Change to your desired ratio
-                    viewMode: 1
-                });
-            }).on('hidden.bs.modal', function () {
-                cropper.destroy();
-                cropper = null;
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+<script>
+    let cropper;
+    function openCropModal(imageUrl) {
+        document.getElementById('imageToCrop').src = imageUrl;
+        $('#cropModal').modal('show');
+        $('#cropModal').on('shown.bs.modal', function () {
+            cropper = new Cropper(document.getElementById('imageToCrop'), {
+                aspectRatio: 16 / 9,  // Change to your desired ratio
+                viewMode: 1
             });
-        }
+        }).on('hidden.bs.modal', function () {
+            cropper.destroy();
+            cropper = null;
+        });
+    }
 
-        function cropImage() {
-            var canvas = cropper.getCroppedCanvas();
-            canvas.toBlob(function(blob) {
-                var formData = new FormData();
-                formData.append('cropped_image', blob, 'cropped.png');
+    function cropImage() {
+        const canvas = cropper.getCroppedCanvas();
+        const croppedImage = canvas.toDataURL('image/png');
+        const croppedCanvas = document.getElementById('croppedCanvas');
+        const context = croppedCanvas.getContext('2d');
+        croppedCanvas.width = canvas.width;
+        croppedCanvas.height = canvas.height;
+        context.drawImage(canvas, 0, 0);
 
-                fetch('{{ route('cp_image_generation.crop') }}', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();  // Reload the page to show the cropped image
-                    } else {
-                        alert('Crop failed');
-                    }
-                });
+        // Send the cropped image data to the server
+        canvas.toBlob(function(blob) {
+            const formData = new FormData();
+            formData.append('cropped_image', blob, 'cropped.png');
+
+            fetch('{{ route('cp_image_generation.crop') }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();  // Reload the page to show the cropped image
+                } else {
+                    alert('Crop failed');
+                }
             });
-        }
-    </script>
+        });
+    }
+</script>
 <!-- resources/views/cp_image_generation/index.blade.php -->
 
 @endsection
