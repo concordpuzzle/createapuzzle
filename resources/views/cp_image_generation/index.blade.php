@@ -93,27 +93,18 @@ $('#cropButton').on('click', function() {
 });
 
 function cropImage() {
-    if (!cropper) {
-        console.error('Cropper.js instance is not initialized');
-        return;
-    }
-    
     const canvas = cropper.getCroppedCanvas();
-    if (!canvas) {
-        console.error('Failed to get cropped canvas');
-        return;
-    }
-    
-    console.log('Canvas cropped, converting to blob...');
+    const croppedImage = canvas.toDataURL('image/png');
+    const croppedCanvas = document.getElementById('croppedCanvas');
+    const context = croppedCanvas.getContext('2d');
+    croppedCanvas.width = canvas.width;
+    croppedCanvas.height = canvas.height;
+    context.drawImage(canvas, 0, 0);
+
+    // Send the cropped image data to the server
     canvas.toBlob(function(blob) {
-        if (!blob) {
-            console.error('Failed to convert canvas to blob');
-            return;
-        }
-        
         const formData = new FormData();
         formData.append('cropped_image', blob, 'cropped.png');
-        console.log('Blob created, sending to server...');
 
         fetch('{{ route('cp_image_generation.crop') }}', {
             method: 'POST',
@@ -122,27 +113,21 @@ function cropImage() {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             }
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            console.log('Server response:', data);
             if (data.success) {
-                window.location.href = `/cp-image-generation/cropped/${data.id}`;
+                location.href = '{{ url('cp-image-generation/cropped') }}/' + data.id;  // Redirect to cropped view
             } else {
-                alert('Crop failed');
-                console.error('Crop failed:', data.error);
+                alert('Crop failed: ' + data.error);
             }
         })
         .catch(error => {
-            console.error('Error during fetch:', error);
-            alert('An error occurred during the cropping process');
+            console.error('Error:', error);
+            alert('Crop failed: ' + error.message);
         });
-    }, 'image/png');
+    });
 }
+
 
 
 </script>
