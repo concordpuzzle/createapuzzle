@@ -124,9 +124,7 @@ class CPImageGenerationController extends Controller
 
         return $imagePath;
     }
-}
-
-public function createProduct(Request $request)
+    public function createProduct(Request $request)
 {
     $request->validate([
         'title' => 'required|string|max:255',
@@ -172,4 +170,6 @@ public function createProduct(Request $request)
         Log::error('Error creating product in WooCommerce', ['error' => $e->getMessage()]);
         return redirect()->route('cp_image_generation.index')->with('error', 'An error occurred while creating the puzzle');
     }
+}
+
 }
