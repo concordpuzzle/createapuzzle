@@ -1,8 +1,5 @@
 <?php
-// database/migrations/xxxx_xx_xx_create_cp_image_generations_table.php
-
 // app/Models/CPImageGeneration.php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,9 +9,17 @@ class CPImageGeneration extends Model
 {
     use HasFactory;
 
-    protected $table = 'c_p_image_generations'; // Explicitly set the table name
+    protected $fillable = [
+        'user_id',
+        'prompt',
+        'generated_image',
+        'midjourney_message_id',
+    ];
 
-    protected $fillable = ['prompt', 'generated_image', 'midjourney_message_id'];
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
 
 
