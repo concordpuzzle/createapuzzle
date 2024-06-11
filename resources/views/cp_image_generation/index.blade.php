@@ -34,7 +34,7 @@
                     <div class="card-body">
                         <p class="card-text">{{ $image->prompt }}</p>
                         <button class="btn btn-primary" onclick="openCropModal('{{ Storage::url($image->generated_image) }}', '{{ $image->id }}')">Crop Image</button>
-                        <button class="btn btn-success" onclick="openUpscaleModal('{{ $image->midjourney_message_id }}')">Upscale Image</button>
+                        <button class="btn btn-success" onclick="openUpscaleModal('{{ $image->id }}', '{{ $image->midjourney_message_id }}')">Upscale Image</button>
                     </div>
                 </div>
             </div>
@@ -94,10 +94,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <script>
     let cropper;
+    let imageId;
     let messageId;
+
     function openCropModal(imageUrl, id) {
         document.getElementById('imageToCrop').src = imageUrl;
-        messageId = id;
+        imageId = id;
         $('#cropModal').modal('show');
         $('#cropModal').on('shown.bs.modal', function () {
             cropper = new Cropper(document.getElementById('imageToCrop'), {
@@ -146,8 +148,9 @@
         });
     }
 
-    function openUpscaleModal(id) {
-        messageId = id;
+    function openUpscaleModal(id, msgId) {
+        imageId = id;
+        messageId = msgId;
         $('#upscaleModal').modal('show');
     }
 
@@ -166,7 +169,7 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Upscaling initiated');
+                location.href = '{{ url('cp-image-generation/upscaled') }}/' + data.id;  // Redirect to upscaled view
             } else {
                 alert('Upscaling failed: ' + data.error);
             }
