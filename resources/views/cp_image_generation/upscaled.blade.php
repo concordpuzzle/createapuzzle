@@ -52,7 +52,7 @@
         $('#cropModal').modal('show');
         $('#cropModal').on('shown.bs.modal', function () {
             cropper = new Cropper(document.getElementById('imageToCrop'), {
-                aspectRatio: 16 / 9,  // Change to your desired ratio
+                aspectRatio: 1.35 / 1,  // Change to your desired ratio
                 viewMode: 1
             });
         }).on('hidden.bs.modal', function () {
