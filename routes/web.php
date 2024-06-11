@@ -43,7 +43,7 @@ Route::get('/cp-image-generation', [CPImageGenerationController::class, 'index']
 Route::post('/cp-image-generation', [CPImageGenerationController::class, 'store'])->name('cp_image_generation.store');
 
 Route::post('/cp-image-generation/crop', [CPImageGenerationController::class, 'crop'])->name('cp_image_generation.crop');
-Route::get('/cp-image-generation/cropped/{id}', [CPImageGenerationController::class, 'showCropped'])->name('cp_image_generation.cropped');
+Route::get('cp-image-generation/cropped/{id}', [CPImageGenerationController::class, 'showCropped'])->name('cp_image_generation.cropped');
 Route::post('/cp-image-generation/create-product', [CPImageGenerationController::class, 'createProduct'])->name('cp_image_generation.create_product');
 Route::post('/cp-image-generation/upscale', [CPImageGenerationController::class, 'upscale'])->name('cp_image_generation.upscale');
 Route::get('/cp-image-generation/upscaled', [CPImageGenerationController::class, 'showUpscaledImage'])->name('cp_image_generation.upscaled');

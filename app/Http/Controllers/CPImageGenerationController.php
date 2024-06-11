@@ -268,7 +268,11 @@ class CPImageGenerationController extends Controller
     return view('cp_image_generation.upscaled', ['imageUrl' => $imageUrl]);
 }
 
-    
+public function showCropped($id)
+{
+    $image = CPImageGeneration::findOrFail($id);
+    return view('cp_image_generation.cropped', compact('image'));
+}
     
 
     public function crop(Request $request)
