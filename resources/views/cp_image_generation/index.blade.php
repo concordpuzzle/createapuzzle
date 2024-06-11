@@ -4,8 +4,6 @@
 
 @section('content')
 
-@livewireStyles
-@livewireScripts
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
 
 <div class="container">
