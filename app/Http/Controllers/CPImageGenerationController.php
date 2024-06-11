@@ -21,111 +21,118 @@ class CPImageGenerationController extends Controller
     }
 
     public function store(Request $request)
-{
-    Log::info('Image generation request received', ['request' => $request->all()]);
-
-    $request->validate([
-        'prompt' => 'required|string|max:255',
-    ]);
-
-    $prompt = $request->input('prompt');
-    $apiKey = env('MIDJOURNEY_API_TOKEN');
-    $apiUrl = env('MIDJOURNEY_API_URL');
-
-    if (!$apiUrl || !$apiKey) {
-        Log::error('MidJourney API URL or Token is not set', [
-            'apiUrl' => $apiUrl,
-            'apiKey' => $apiKey
+    {
+        Log::info('Image generation request received', ['request' => $request->all()]);
+    
+        $request->validate([
+            'prompt' => 'required|string|max:255',
         ]);
-        return redirect()->route('cp_image_generation.index')->with('error', 'MidJourney API URL or Token is not set.');
-    }
-
-    try {
-        // Log the request being sent to MidJourney API
-        $apiEndpoint = $apiUrl . '/api/v1/midjourney/imagine';
-        Log::info('Sending request to MidJourney API', [
-            'url' => $apiEndpoint,
-            'prompt' => $prompt,
-            'headers' => ['Authorization' => 'Bearer ' . $apiKey]
-        ]);
-
-        // Send the prompt to MidJourney API
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $apiKey,
-            'Content-Type' => 'application/json'
-        ])->post($apiEndpoint, [
-            'prompt' => $prompt,
-        ]);
-
-        // Log the response received from MidJourney API
-        Log::info('Response from MidJourney API', [
-            'status' => $response->status(),
-            'body' => $response->body(),
-        ]);
-
-        if ($response->failed()) {
-            throw new \Exception('Failed to get a successful response from MidJourney API: ' . $response->body());
+    
+        $prompt = $request->input('prompt');
+        $apiKey = env('MIDJOURNEY_API_TOKEN');
+        $apiUrl = env('MIDJOURNEY_API_URL');
+    
+        if (!$apiUrl || !$apiKey) {
+            Log::error('MidJourney API URL or Token is not set', [
+                'apiUrl' => $apiUrl,
+                'apiKey' => $apiKey
+            ]);
+            return redirect()->route('cp_image_generation.index')->with('error', 'MidJourney API URL or Token is not set.');
         }
-
-        // Assuming the API returns a messageId and status
-        $messageId = $response->json()['messageId'];
-
-        // Track the progress of the image generation
-        $progressUrl = $apiUrl . '/api/v1/midjourney/message/' . $messageId;
-        $imageUrl = null;
-
-        // Polling mechanism to check the image generation status
-        for ($i = 0; $i < 30; $i++) { // Increase the number of retries to allow more time for processing
-            sleep(10); // Wait for 10 seconds before checking the status again
-
-            $progressResponse = Http::withHeaders([
+    
+        try {
+            // Log the request being sent to MidJourney API
+            $apiEndpoint = $apiUrl . '/api/v1/midjourney/imagine';
+            Log::info('Sending request to MidJourney API', [
+                'url' => $apiEndpoint,
+                'prompt' => $prompt,
+                'headers' => ['Authorization' => 'Bearer ' . $apiKey]
+            ]);
+    
+            // Send the prompt to MidJourney API
+            $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
                 'Content-Type' => 'application/json'
-            ])->get($progressUrl);
-
-            Log::info('Progress response from MidJourney API', [
-                'status' => $progressResponse->status(),
-                'body' => $progressResponse->body(),
+            ])->post($apiEndpoint, [
+                'prompt' => $prompt,
             ]);
-
-            $progressData = $progressResponse->json();
-
-            if (isset($progressData['status']) && $progressData['status'] === 'COMPLETED' && isset($progressData['uri'])) {
-                $imageUrl = $progressData['uri'];
-                break;
-            } elseif (isset($progressData['status']) && $progressData['status'] === 'FAILED') {
-                throw new \Exception('Image generation failed: ' . $progressResponse->body());
-            } elseif (!isset($progressData['status']) || $progressData['status'] !== 'PROCESSING') {
-                throw new \Exception('Unexpected response: ' . $progressResponse->body());
+    
+            // Log the response received from MidJourney API
+            Log::info('Response from MidJourney API', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+    
+            if ($response->failed()) {
+                throw new \Exception('Failed to get a successful response from MidJourney API: ' . $response->body());
             }
+    
+            // Assuming the API returns a messageId and status
+            $messageId = $response->json()['messageId'];
+    
+            // Track the progress of the image generation
+            $progressUrl = $apiUrl . '/api/v1/midjourney/message/' . $messageId;
+            $imageUrl = null;
+    
+            // Polling mechanism to check the image generation status
+            for ($i = 0; $i < 30; $i++) { // Increase the number of retries to allow more time for processing
+                sleep(10); // Wait for 10 seconds before checking the status again
+    
+                $progressResponse = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Content-Type' => 'application/json'
+                ])->get($progressUrl);
+    
+                Log::info('Progress response from MidJourney API', [
+                    'status' => $progressResponse->status(),
+                    'body' => $progressResponse->body(),
+                ]);
+    
+                $progressData = $progressResponse->json();
+    
+                if (isset($progressData['status'])) {
+                    if ($progressData['status'] === 'COMPLETED' && isset($progressData['uri'])) {
+                        $imageUrl = $progressData['uri'];
+                        break;
+                    } elseif ($progressData['status'] === 'FAILED') {
+                        throw new \Exception('Image generation failed: ' . $progressResponse->body());
+                    } elseif ($progressData['status'] === 'QUEUED' || $progressData['status'] === 'PROCESSING') {
+                        continue; // Continue polling
+                    } else {
+                        throw new \Exception('Unexpected response: ' . $progressResponse->body());
+                    }
+                } else {
+                    throw new \Exception('Unexpected response: ' . $progressResponse->body());
+                }
+            }
+    
+            if (!$imageUrl) {
+                throw new \Exception('Failed to get image URL after polling.');
+            }
+    
+            // Store the image locally
+            $imageContents = file_get_contents($imageUrl);
+            $imageName = 'generated_images/' . uniqid() . '.png';
+            Storage::put('public/' . $imageName, $imageContents);
+    
+            // Save the image information to the database
+            $image = CPImageGeneration::create([
+                'prompt' => $prompt,
+                'generated_image' => $imageName,
+            ]);
+    
+            return redirect()->route('cp_image_generation.index')->with('success', 'Image generated successfully.');
+        } catch (\Exception $e) {
+            Log::error('Error generating image', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            return redirect()->route('cp_image_generation.index')->with('error', 'Failed to generate image.');
         }
-
-        if (!$imageUrl) {
-            throw new \Exception('Failed to get image URL after polling.');
-        }
-
-        // Store the image locally
-        $imageContents = file_get_contents($imageUrl);
-        $imageName = 'generated_images/' . uniqid() . '.png';
-        Storage::put('public/' . $imageName, $imageContents);
-
-        // Save the image information to the database
-        $image = CPImageGeneration::create([
-            'prompt' => $prompt,
-            'generated_image' => $imageName,
-        ]);
-
-        return redirect()->route('cp_image_generation.index')->with('success', 'Image generated successfully.');
-    } catch (\Exception $e) {
-        Log::error('Error generating image', [
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-        ]);
-        return redirect()->route('cp_image_generation.index')->with('error', 'Failed to generate image.');
     }
-}
+    
 
     
 
