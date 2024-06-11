@@ -1,5 +1,6 @@
 <?php 
 // app/Http/Controllers/CPImageGenerationController.php
+// app/Http/Controllers/CPImageGenerationController.php
 
 namespace App\Http\Controllers;
 
@@ -50,13 +51,17 @@ class CPImageGenerationController extends Controller
     private function generateImage($prompt)
     {
         $apiKey = env('OPENAI_API_KEY');
+        Log::info('Using API Key', ['api_key' => $apiKey]);
+
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $apiKey,
-        ])->post('https://api.openai.com/v1/images/generations', [  // Correct the endpoint here
+        ])->post('https://api.openai.com/v1/images/generations', [
             'prompt' => $prompt,
             'n' => 1,
             'size' => '512x512',
         ]);
+
+        Log::info('OpenAI API response', ['response' => $response->body()]);
 
         if ($response->successful()) {
             $responseData = $response->json();
