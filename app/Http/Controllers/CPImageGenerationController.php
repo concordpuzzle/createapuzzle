@@ -277,46 +277,45 @@ public function showCropped($id)
 }
  
 public function createProduct(Request $request)
-{
-    $image = CPImageGeneration::findOrFail($request->input('image_id'));
+    {
+        $image = CPImageGeneration::findOrFail($request->input('image_id'));
 
-    try {
-        $woocommerce = new Client(
-            env('WOOCOMMERCE_STORE_URL'),
-            env('WOOCOMMERCE_CONSUMER_KEY'),
-            env('WOOCOMMERCE_CONSUMER_SECRET'),
-            [
-                'version' => 'wc/v3',
-            ]
-        );
-
-        $publicUrl = Storage::url($image->generated_image);
-
-        // Log the public URL for debugging
-        Log::info("Public URL: " . $publicUrl);
-
-        $data = [
-            'name' => $request->input('title'),
-            'description' => $request->input('description'),
-            'images' => [
+        try {
+            $woocommerce = new Client(
+                env('WOOCOMMERCE_STORE_URL'),
+                env('WOOCOMMERCE_CONSUMER_KEY'),
+                env('WOOCOMMERCE_CONSUMER_SECRET'),
                 [
-                    'src' => $publicUrl
+                    'version' => 'wc/v3',
                 ]
-            ],
-            'type' => 'simple',
-            'regular_price' => '19.99',
-        ];
+            );
 
-        $product = $woocommerce->post('products', $data);
-        return response()->json(['success' => true, 'product' => $product]);
+            $publicUrl = Storage::url($image->generated_image);
 
-    } catch (HttpClientException $e) {
-        $error = $e->getMessage();
-        Log::error("Error creating product: cURL Error: $error");
-        return response()->json(['success' => false, 'error' => $error]);
+            // Log the public URL for debugging
+            Log::info("Public URL: " . $publicUrl);
+
+            $data = [
+                'name' => $request->input('title'),
+                'description' => $request->input('description'),
+                'images' => [
+                    [
+                        'src' => $publicUrl
+                    ]
+                ],
+                'type' => 'simple',
+                'regular_price' => '19.99',
+            ];
+
+            $product = $woocommerce->post('products', $data);
+            return response()->json(['success' => true, 'product' => $product]);
+
+        } catch (HttpClientException $e) {
+            $error = $e->getMessage();
+            Log::error("Error creating product: cURL Error: $error");
+            return response()->json(['success' => false, 'error' => $error]);
+        }
     }
-}
-
 public function crop(Request $request)
     {
         Log::info('Cropping image request received', ['request' => $request->all()]);
