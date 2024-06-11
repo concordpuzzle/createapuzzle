@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Automattic\WooCommerce\Client;
+use Automattic\WooCommerce\Client  as WooCommerceClient;
 
 class CPImageGenerationController extends Controller
 {
