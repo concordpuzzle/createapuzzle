@@ -166,7 +166,7 @@ class CPImageGenerationController extends Controller
 
     try {
         // Send the upscale request to MidJourney API
-        $apiEndpoint = $apiUrl . '/api/v1/upscale';  // Update to the correct endpoint
+        $apiEndpoint = $apiUrl . '/api/v1/midjourney/button';  // Correct endpoint
         Log::info('Sending upscale request to MidJourney API', [
             'url' => $apiEndpoint,
             'messageId' => $messageId,
