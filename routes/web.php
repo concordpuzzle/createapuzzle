@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ImageGenerationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,3 +27,16 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 });
+
+// routes/web.php
+
+Route::get('/staging', [ImageGenerationController::class, 'index'])->name('staging.index');
+Route::post('/staging/generate', [ImageGenerationController::class, 'generate'])->name('staging.generate');
+
+
+// routes/web.php
+
+use App\Http\Controllers\CPImageGenerationController;
+
+Route::get('/cp-image-generation', [CPImageGenerationController::class, 'index'])->name('cp_image_generation.index');
+Route::post('/cp-image-generation', [CPImageGenerationController::class, 'store'])->name('cp_image_generation.store');
