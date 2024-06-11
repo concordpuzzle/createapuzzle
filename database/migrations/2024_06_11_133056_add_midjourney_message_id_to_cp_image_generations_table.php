@@ -8,14 +8,14 @@ class AddMidjourneyMessageIdToCpImageGenerationsTable extends Migration
 {
     public function up()
     {
-        Schema::table('cp_image_generations', function (Blueprint $table) {
+        Schema::table('c_p_image_generations', function (Blueprint $table) {
             $table->string('midjourney_message_id', 40)->nullable();
         });
     }
 
     public function down()
     {
-        Schema::table('cp_image_generations', function (Blueprint $table) {
+        Schema::table('c_p_image_generations', function (Blueprint $table) {
             $table->dropColumn('midjourney_message_id');
         });
     }
