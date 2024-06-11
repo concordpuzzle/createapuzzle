@@ -1,17 +1,18 @@
 @extends('layouts.app')
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
 @section('content')
-<div class="container mx-auto text-center">
-    <h1 class="text-4xl my-8">Published Puzzles</h1>
-    <div class="flex flex-wrap -mx-4 justify-center">
+<div class="container text-center my-5">
+    <h1 class="mb-4" style="font-size: 33px;">Published Puzzles</h1>
+    <div class="row justify-content-center">
         @foreach($publishedProducts as $product)
-            <div class="w-1/4 px-4 mb-8">
-                <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                    <img src="{{ Storage::url($product->cropped_image) }}" class="w-full h-64 object-cover" alt="{{ $product->title }}" style="border-radius: 4px;">
-                    <div class="p-4">
-                        <h5 class="text-lg font-bold mb-2">{{ $product->title }}</h5>
-                        <p class="text-gray-600 mb-4">{{ $product->description }}</p>
-                        <a href="{{ $product->product_url }}" class="inline-block bg-red-700 text-white py-2 px-4 rounded" target="_blank">View Product</a>
+            <div class="col-md-4 mb-4 d-flex justify-content-center">
+                <div class="card shadow-sm" style="width: 18rem;">
+                    <img src="{{ Storage::url($product->cropped_image) }}" class="card-img-top" alt="{{ $product->title }}" style="border-radius: 4px;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ $product->title }}</h5>
+                        <p class="card-text">{{ $product->description }}</p>
+                        <a href="{{ $product->product_url }}" class="btn btn-danger" style="background-color: #b71540; border-color: #b71540;">View Product</a>
                     </div>
                 </div>
             </div>
