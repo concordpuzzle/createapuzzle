@@ -77,7 +77,7 @@
                                     <i class="fa-solid fa-camera-retro" style="color:#fff;font-size:22px;"></i>
                                 </div>
 
-                                <h2 class="mt-6 text-xl font-semibold text-gray-900">Make a <u>Generative AI</u> Puzzle</h2>
+                                <h2 class="mt-6 text-xl font-semibold text-gray-900">Make a Puzzle with <u>Generative AI</u></h2>
 
                                 <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
                                 Upload your own photo to create a unique, custom jigsaw puzzle. Choose the number of pieces and other options.</p>
@@ -93,7 +93,7 @@
                                     <i class="fa-solid fa-pencil" style="color:#fff;font-size:22px;"></i>
                                 </div>
 
-                                <h2 class="mt-6 text-xl font-semibold text-gray-900">Make an <u>Illustration</u> Puzzle</h2>
+                                <h2 class="mt-6 text-xl font-semibold text-gray-900">Browse <u>Community-Made</u> Puzzles</h2>
 
                                 <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
                                 Provide a description or prompt to generate a custom illustration. Our AI will create a unique image based on your input, which you can then turn into a personalized jigsaw puzzle by selecting the number of pieces and other options.                                </p>
@@ -104,17 +104,17 @@
                             </svg>
                         </a>
 
-                        <a href="https://laravel.com/docs" class="scale-100 p-6 bg-white rounded-lg shadow-none shadow-gray-500/20  flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
+                        <a href="#" class="scale-100 p-6 bg-white rounded-lg shadow-none shadow-gray-500/20  flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                             <div>
                                 <div style="background-color:#0c2461" class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full">
                                 <i class="fa-solid fa-palette" style="color:#fff;font-size:22px;"></i>
 
                                 </div>
 
-                                <h2 class="mt-6 text-xl font-semibold text-gray-900">Make a <u>Painting</u> Puzzle</h2>
+                                <h2 class="mt-6 text-xl font-semibold text-gray-900">Make a Puzzle with a <u>Photo</u></h2>
 
                                 <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                                Enter a description or prompt to generate a custom painting. Our AI will create a unique artwork based on your input, which you can then transform into a personalized jigsaw puzzle by choosing the number of pieces and other options.                                </p>
+                                Upload your own photo to create a unique, custom jigsaw puzzle. Choose the number of pieces and other options.                                </p>
                             </div>
 
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="self-center shrink-0 stroke-black-500 w-6 h-6 mx-6">
