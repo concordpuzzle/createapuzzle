@@ -50,33 +50,38 @@ class CPImageGenerationController extends Controller
     }
 
     public function crop(Request $request)
-    {
-        $request->validate([
-            'cropped_image' => 'required|image',
+{
+    $request->validate([
+        'cropped_image' => 'required|image',
+    ]);
+
+    try {
+        // Log the file upload attempt
+        Log::info('Cropping image attempt', ['file' => $request->file('cropped_image')]);
+
+        $croppedImage = $request->file('cropped_image');
+        $path = $croppedImage->store('public/generated_images');
+
+        // Log the saved image path
+        Log::info('Cropped image saved successfully', ['path' => $path]);
+
+        // Save cropped image information to database
+        $image = CPImageGeneration::create([
+            'prompt' => 'Cropped Image',
+            'generated_image' => $path,
         ]);
 
-        try {
-            $croppedImage = $request->file('cropped_image');
-            $path = $croppedImage->store('public/generated_images');
-            Log::info('Cropped image saved successfully', ['path' => $path]);
+        // Generate AI title and description
+        $aiResponse = $this->generateTitleAndDescription($path);
+        $title = $aiResponse['title'];
+        $description = $aiResponse['description'];
 
-            // Save cropped image information to database
-            $image = CPImageGeneration::create([
-                'prompt' => 'Cropped Image',
-                'generated_image' => $path,
-            ]);
-
-            // Generate AI title and description
-            $aiResponse = $this->generateTitleAndDescription($path);
-            $title = $aiResponse['title'];
-            $description = $aiResponse['description'];
-
-            return response()->json(['success' => true, 'id' => $image->id, 'path' => Storage::url($path), 'title' => $title, 'description' => $description]);
-        } catch (\Exception $e) {
-            Log::error('Error during image cropping', ['error' => $e->getMessage()]);
-            return response()->json(['success' => false, 'error' => $e->getMessage()]);
-        }
+        return response()->json(['success' => true, 'id' => $image->id, 'path' => Storage::url($path), 'title' => $title, 'description' => $description]);
+    } catch (\Exception $e) {
+        Log::error('Error during image cropping', ['error' => $e->getMessage()]);
+        return response()->json(['success' => false, 'error' => $e->getMessage()]);
     }
+}
 
     public function showCropped($id)
     {
