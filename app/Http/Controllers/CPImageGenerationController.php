@@ -22,7 +22,7 @@ class CPImageGenerationController extends Controller
         $images = CPImageGeneration::where('user_id', $userId)
             ->orderBy('created_at', 'asc')
             ->get();
-    
+
         return view('cp_image_generation.index', compact('images'));
     }
 
@@ -47,6 +47,7 @@ class CPImageGenerationController extends Controller
         }
 
         try {
+            // Log the request being sent to MidJourney API
             $apiEndpoint = $apiUrl . '/api/v1/midjourney/imagine';
             Log::info('Sending request to MidJourney API', [
                 'url' => $apiEndpoint,
@@ -54,6 +55,7 @@ class CPImageGenerationController extends Controller
                 'headers' => ['Authorization' => 'Bearer ' . $apiKey]
             ]);
 
+            // Send the prompt to MidJourney API
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
                 'Content-Type' => 'application/json'
@@ -61,6 +63,7 @@ class CPImageGenerationController extends Controller
                 'prompt' => $prompt,
             ]);
 
+            // Log the response received from MidJourney API
             Log::info('Response from MidJourney API', [
                 'status' => $response->status(),
                 'body' => $response->body(),
@@ -70,12 +73,16 @@ class CPImageGenerationController extends Controller
                 throw new \Exception('Failed to get a successful response from MidJourney API: ' . $response->body());
             }
 
+            // Assuming the API returns a messageId and status
             $messageId = $response->json()['messageId'];
+
+            // Track the progress of the image generation
             $progressUrl = $apiUrl . '/api/v1/midjourney/message/' . $messageId;
             $imageUrl = null;
 
-            for ($i = 0; $i < 30; $i++) {
-                sleep(10);
+            // Polling mechanism to check the image generation status
+            for ($i = 0; $i < 30; $i++) { // Increase the number of retries to allow more time for processing
+                sleep(10); // Wait for 10 seconds before checking the status again
 
                 $progressResponse = Http::withHeaders([
                     'Authorization' => 'Bearer ' . $apiKey,
@@ -96,7 +103,7 @@ class CPImageGenerationController extends Controller
                     } elseif ($progressData['status'] === 'FAILED') {
                         throw new \Exception('Image generation failed: ' . $progressResponse->body());
                     } elseif ($progressData['status'] === 'QUEUED' || $progressData['status'] === 'PROCESSING') {
-                        continue;
+                        continue; // Continue polling
                     } else {
                         throw new \Exception('Unexpected response: ' . $progressResponse->body());
                     }
@@ -109,15 +116,17 @@ class CPImageGenerationController extends Controller
                 throw new \Exception('Failed to get image URL after polling.');
             }
 
+            // Store the image locally
             $imageContents = file_get_contents($imageUrl);
             $imageName = 'generated_images/' . uniqid() . '.png';
             Storage::put('public/' . $imageName, $imageContents);
 
+            // Save the image information to the database
             $image = CPImageGeneration::create([
+                'user_id' => auth()->user()->id, // Associate with the authenticated user
                 'prompt' => $prompt,
                 'generated_image' => $imageName,
                 'midjourney_message_id' => $messageId,
-                'user_id' => auth()->user()->id,
             ]);
 
             return redirect()->route('cp_image_generation.index')->with('success', 'Image generated successfully.');
