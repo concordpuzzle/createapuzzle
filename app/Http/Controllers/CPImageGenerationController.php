@@ -82,7 +82,7 @@ class CPImageGenerationController extends Controller
     {
         $imageContents = file_get_contents($url);
         $imageName = uniqid() . '.png';
-        $imagePath = 'generated_images/' . $imageName;
+        $imagePath = 'public/generated_images/' . $imageName;
 
         Storage::put($imagePath, $imageContents);
 
