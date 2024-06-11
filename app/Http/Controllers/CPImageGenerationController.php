@@ -1,5 +1,4 @@
 <?php 
-
 // app/Http/Controllers/CPImageGenerationController.php
 
 namespace App\Http\Controllers;
@@ -20,6 +19,8 @@ class CPImageGenerationController extends Controller
 
     public function store(Request $request)
     {
+        Log::info('Form submission received', ['request' => $request->all()]);
+
         $request->validate([
             'prompt' => 'required|string|max:255',
         ]);
@@ -35,17 +36,20 @@ class CPImageGenerationController extends Controller
                 'prompt' => $prompt,
                 'generated_image' => $path,
             ]);
+
+            Log::info('Image generated and saved successfully', ['path' => $path]);
+
+            return redirect()->route('cp_image_generation.index')->with('success', 'Image generated successfully.');
         } else {
+            Log::error('Failed to generate image');
+
             return redirect()->route('cp_image_generation.index')->with('error', 'Failed to generate image.');
         }
-
-        return redirect()->route('cp_image_generation.index');
     }
 
     private function generateImage($prompt)
     {
         $apiKey = env('OPENAI_API_KEY');
-
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $apiKey,
         ])->post('https://api.openai.com/v1/images', [

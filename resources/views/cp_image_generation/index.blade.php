@@ -1,16 +1,27 @@
 <!-- resources/views/cp_image_generation/index.blade.php -->
 
-@extends('layouts.app')
 
 @livewireStyles
 @livewireScripts
 
 @livewire('navigation-menu')
+<!-- resources/views/cp_image_generation/index.blade.php -->
 
+@extends('layouts.app')
 
 @section('content')
 <div class="container">
     <h1>Generate Your Custom Image</h1>
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
     <form method="POST" action="{{ route('cp_image_generation.store') }}">
         @csrf
         <div class="form-group">
