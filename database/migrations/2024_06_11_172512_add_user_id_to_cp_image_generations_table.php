@@ -9,13 +9,18 @@ class AddUserIdToCpImageGenerationsTable extends Migration
     public function up()
     {
         Schema::table('c_p_image_generations', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id')->nullable()->after('id');
+            if (!Schema::hasColumn('c_p_image_generations', 'user_id')) {
+                $table->unsignedBigInteger('user_id')->nullable()->after('id');
+            }
+            $table->unsignedBigInteger('user_id')->nullable(false)->change();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
     public function down()
     {
         Schema::table('c_p_image_generations', function (Blueprint $table) {
+            $table->dropForeign(['user_id']);
             $table->dropColumn('user_id');
         });
     }
