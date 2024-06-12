@@ -141,6 +141,34 @@
                     </div>
                 </div>
             </div>
+            <!-- Popular Community Made Puzzles Section -->
+<div class="mt-16">
+    <h2 class="mb-4" style="font-size: 33px; color: #b71540;" class="arvo-bold">Popular Community Made Puzzles</h2>
+    <div class="row justify-content-center">
+        @foreach($popularProducts as $product)
+            <div class="col-md-3 mb-4 d-flex justify-content-center">
+                <div class="card h-100 shadow-sm" style="width: 18rem;">
+                    <img src="{{ Storage::url($product->cropped_image) }}" class="card-img-top" alt="{{ $product->title }}" style="border-radius: 4px;">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title radio-canada-big">
+                            {{ $product->title }}
+                            <button class="like-button {{ $product->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" onclick="likeProduct({{ $product->id }}, this)">
+                                <i class="fa fa-heart{{ $product->likes->contains('user_id', auth()->id()) ? '' : '-o' }}"></i>
+                            </button>
+                        </h5>
+                        <div class="like-count">
+                            <span id="like-count-{{ $product->id }}">{{ $product->likes->count() }}</span> people like this
+                        </div>
+                        <div class="mt-auto">
+                            <a href="{{ $product->product_url }}" class="btn btn-danger btn-block mt-2" target="_blank">View Product</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</div>
+
         </div>
     </body>
 </html>
