@@ -5,7 +5,7 @@
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
 <div class="container text-center">
-    <h1>Crop Your Puzzle Picture Option</h1>
+    <h1 class="mt-4">Crop Your Puzzle Picture Option</h1>
     <p class="mb-4">Use the cropping tool below to adjust your puzzle picture to your liking. When you're satisfied with the crop, click "Crop Puzzle" to proceed.</p>
     
     @if(session('success'))
@@ -19,7 +19,7 @@
         </div>
     @endif
 
-    <button class="btn crop-puzzle-btn" onclick="submitCroppedImage()">Crop Puzzle</button>
+    <button class="btn crop-puzzle-btn mb-4" onclick="submitCroppedImage()">Crop Puzzle</button>
     
     <div class="mb-4">
         <img id="imageToCrop" src="{{ Storage::url($image->generated_image) }}" class="img-fluid" alt="Upscaled Image">
