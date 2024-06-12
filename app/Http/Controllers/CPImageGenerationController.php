@@ -301,8 +301,32 @@ public function createProduct(Request $request)
 {
     $image = CPImageGeneration::findOrFail($request->input('image_id'));
     $user = auth()->user();
+    $prompt = $image->prompt;
 
     try {
+        // Call OpenAI API to generate a title and description
+        $openaiApiKey = env('OPENAI_API_KEY');
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $openaiApiKey,
+            'Content-Type' => 'application/json'
+        ])->post('https://api.openai.com/v1/completions', [
+            'model' => 'text-davinci-003',
+            'prompt' => "Create a unique title and description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle:'",
+            'max_tokens' => 100,
+            'n' => 1,
+            'stop' => ['\n']
+        ]);
+
+        if ($response->failed()) {
+            throw new \Exception('Failed to get a successful response from OpenAI API: ' . $response->body());
+        }
+
+        $openaiResult = $response->json();
+        $generatedText = $openaiResult['choices'][0]['text'];
+        $generatedLines = explode("\n", trim($generatedText));
+        $title = $generatedLines[0] . ' 500 Piece Puzzle';
+        $description = implode(' ', array_slice($generatedLines, 1));
+
         $woocommerce = new Client(
             env('WOOCOMMERCE_STORE_URL'),
             env('WOOCOMMERCE_CONSUMER_KEY'),
@@ -319,8 +343,8 @@ public function createProduct(Request $request)
         Log::info("Public URL: " . $publicUrl);
 
         $data = [
-            'name' => $request->input('title'),
-            'description' => $request->input('description'),
+            'name' => $title,
+            'description' => $description,
             'images' => [
                 [
                     'src' => $publicUrl
@@ -336,8 +360,8 @@ public function createProduct(Request $request)
         PublishedProduct::create([
             'image_id' => $image->id,
             'user_id' => $user->id,
-            'title' => $request->input('title'),
-            'description' => $request->input('description'),
+            'title' => $title,
+            'description' => $description,
             'product_id' => $product->id,
             'product_url' => $product->permalink,
             'cropped_image' => $image->generated_image, // Assuming the cropped image is stored here
@@ -351,6 +375,14 @@ public function createProduct(Request $request)
         $error = $e->getMessage();
         Log::error("Error creating product: cURL Error: $error");
         return back()->with('error', $error);
+    } catch (\Exception $e) {
+        Log::error('Error generating title and description', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ]);
+        return back()->with('error', 'Failed to generate title and description.');
     }
 }
 
