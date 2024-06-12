@@ -2,6 +2,7 @@
 // app/Http/Controllers/CPImageGenerationController.php
 // app/Http/Controllers/CPImageGenerationController.php
 // app/Http/Controllers/CPImageGenerationController.php
+// app/Http/Controllers/CPImageGenerationController.php
 
 namespace App\Http\Controllers;
 
@@ -12,9 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Automattic\WooCommerce\Client;
 use Automattic\WooCommerce\HttpClient\HttpClientException;
-use App\Models\PublishedProduct; // Add this at the top of your controller
-
-
+use App\Models\PublishedProduct;
 
 class CPImageGenerationController extends Controller
 {
@@ -28,20 +27,15 @@ class CPImageGenerationController extends Controller
         return view('cp_image_generation.index', compact('images'));
     }
 
-
-    // app/Http/Controllers/CPImageGenerationController.php
-
-public function publishedPuzzles()
-{
-    $userId = auth()->user()->id;
-    $publishedProducts = PublishedProduct::where('user_id', $userId)
+    public function publishedPuzzles()
+    {
+        $userId = auth()->user()->id;
+        $publishedProducts = PublishedProduct::where('user_id', $userId)
                             ->orderBy('created_at', 'desc')
                             ->get();
 
-    return view('cp_image_generation.published_puzzles', compact('publishedProducts'));
-}
-
-
+        return view('cp_image_generation.published_puzzles', compact('publishedProducts'));
+    }
 
     public function store(Request $request)
     {
@@ -126,7 +120,6 @@ public function publishedPuzzles()
                     }
                 } else {
                     throw new \Exception('Unexpected response: ' . $progressResponse->body());
-                }
             }
 
             if (!$imageUrl) {
@@ -166,202 +159,202 @@ public function publishedPuzzles()
     
 
     public function upscale(Request $request)
-{
-    Log::info('Upscale request received', ['request' => $request->all()]);
+    {
+        Log::info('Upscale request received', ['request' => $request->all()]);
 
-    $request->validate([
-        'button' => 'required|string',
-        'message_id' => 'required|string|max:40',
-    ]);
-
-    $button = $request->input('button');
-    $messageId = $request->input('message_id');
-    $apiKey = env('MIDJOURNEY_API_TOKEN');
-    $apiUrl = env('MIDJOURNEY_API_URL');
-
-    if (!$apiUrl || !$apiKey) {
-        Log::error('MidJourney API URL or Token is not set', [
-            'apiUrl' => $apiUrl,
-            'apiKey' => $apiKey
-        ]);
-        return response()->json(['error' => 'MidJourney API URL or Token is not set.'], 500);
-    }
-
-    try {
-        // Send the upscale request to MidJourney API
-        $apiEndpoint = $apiUrl . '/api/v1/midjourney/button';
-        Log::info('Sending upscale request to MidJourney API', [
-            'url' => $apiEndpoint,
-            'messageId' => $messageId,
-            'button' => $button,
-            'headers' => ['Authorization' => 'Bearer ' . $apiKey]
+        $request->validate([
+            'button' => 'required|string',
+            'message_id' => 'required|string|max:40',
         ]);
 
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $apiKey,
-            'Content-Type' => 'application/json'
-        ])->post($apiEndpoint, [
-            'messageId' => $messageId,
-            'button' => $button,
-        ]);
+        $button = $request->input('button');
+        $messageId = $request->input('message_id');
+        $apiKey = env('MIDJOURNEY_API_TOKEN');
+        $apiUrl = env('MIDJOURNEY_API_URL');
 
-        Log::info('MidJourney API upscale response', [
-            'status' => $response->status(),
-            'body' => $response->body(),
-        ]);
-
-        if ($response->failed()) {
-            throw new \Exception('Failed to get a successful response from MidJourney API: ' . $response->body());
+        if (!$apiUrl || !$apiKey) {
+            Log::error('MidJourney API URL or Token is not set', [
+                'apiUrl' => $apiUrl,
+                'apiKey' => $apiKey
+            ]);
+            return response()->json(['error' => 'MidJourney API URL or Token is not set.'], 500);
         }
 
-        // Assuming the API returns a new messageId for the upscaled image
-        $newMessageId = $response->json()['messageId'];
-
-        // Polling mechanism to check the upscale status
-        $progressUrl = $apiUrl . '/api/v1/midjourney/message/' . $newMessageId;  // Corrected endpoint
-        $upscaledImageUrl = null;
-
-        for ($i = 0; $i < 30; $i++) { // Increase the number of retries to allow more time for processing
-            sleep(10); // Wait for 10 seconds before checking the status again
-
-            $progressResponse = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $apiKey,
-                'Content-Type' => 'application/json'
-            ])->get($progressUrl);
-
-            Log::info('Upscale progress response from MidJourney API', [
-                'status' => $progressResponse->status(),
-                'body' => $progressResponse->body(),
+        try {
+            // Send the upscale request to MidJourney API
+            $apiEndpoint = $apiUrl . '/api/v1/midjourney/button';
+            Log::info('Sending upscale request to MidJourney API', [
+                'url' => $apiEndpoint,
+                'messageId' => $messageId,
+                'button' => $button,
+                'headers' => ['Authorization' => 'Bearer ' . $apiKey]
             ]);
 
-            $progressData = $progressResponse->json();
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $apiKey,
+                'Content-Type' => 'application/json'
+            ])->post($apiEndpoint, [
+                'messageId' => $messageId,
+                'button' => $button,
+            ]);
 
-            if (isset($progressData['status'])) {
-                if ($progressData['status'] === 'DONE' && isset($progressData['uri'])) {
-                    $upscaledImageUrl = $progressData['uri'];
-                    break;
-                } elseif ($progressData['status'] === 'FAILED') {
-                    throw new \Exception('Upscaling failed: ' . $progressResponse->body());
-                } elseif ($progressData['status'] === 'QUEUED' || $progressData['status'] === 'PROCESSING') {
-                    continue; // Continue polling
+            Log::info('MidJourney API upscale response', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            if ($response->failed()) {
+                throw new \Exception('Failed to get a successful response from MidJourney API: ' . $response->body());
+            }
+
+            // Assuming the API returns a new messageId for the upscaled image
+            $newMessageId = $response->json()['messageId'];
+
+            // Polling mechanism to check the upscale status
+            $progressUrl = $apiUrl . '/api/v1/midjourney/message/' . $newMessageId;  // Corrected endpoint
+            $upscaledImageUrl = null;
+
+            for ($i = 0; $i < 30; $i++) { // Increase the number of retries to allow more time for processing
+                sleep(10); // Wait for 10 seconds before checking the status again
+
+                $progressResponse = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Content-Type' => 'application/json'
+                ])->get($progressUrl);
+
+                Log::info('Upscale progress response from MidJourney API', [
+                    'status' => $progressResponse->status(),
+                    'body' => $progressResponse->body(),
+                ]);
+
+                $progressData = $progressResponse->json();
+
+                if (isset($progressData['status'])) {
+                    if ($progressData['status'] === 'DONE' && isset($progressData['uri'])) {
+                        $upscaledImageUrl = $progressData['uri'];
+                        break;
+                    } elseif ($progressData['status'] === 'FAILED') {
+                        throw new \Exception('Upscaling failed: ' . $progressResponse->body());
+                    } elseif ($progressData['status'] === 'QUEUED' || $progressData['status'] === 'PROCESSING') {
+                        continue; // Continue polling
+                    } else {
+                        throw new \Exception('Unexpected response: ' . $progressResponse->body());
+                    }
                 } else {
                     throw new \Exception('Unexpected response: ' . $progressResponse->body());
                 }
-            } else {
-                throw new \Exception('Unexpected response: ' . $progressResponse->body());
             }
+
+            if (!$upscaledImageUrl) {
+                throw new \Exception('Failed to get upscaled image URL after polling.');
+            }
+
+            // Store the upscaled image locally
+            $imageContents = file_get_contents($upscaledImageUrl);
+            $imageName = 'generated_images/upscaled_' . uniqid() . '.png';
+            Storage::put('public/' . $imageName, $imageContents);
+
+            // Save the upscaled image information to the database
+            $image = CPImageGeneration::create([
+                'user_id' => auth()->user()->id, // Associate with the authenticated user
+                'prompt' => CPImageGeneration::find($messageId)->prompt, // Keep the original prompt
+                'generated_image' => $imageName,
+                'midjourney_message_id' => $newMessageId,
+            ]);
+
+            return response()->json(['success' => true, 'id' => $image->id]);
+        } catch (\Exception $e) {
+            Log::error('Error upscaling image', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            return response()->json(['error' => 'Failed to upscale image.'], 500);
         }
-
-        if (!$upscaledImageUrl) {
-            throw new \Exception('Failed to get upscaled image URL after polling.');
-        }
-
-        // Store the upscaled image locally
-        $imageContents = file_get_contents($upscaledImageUrl);
-        $imageName = 'generated_images/upscaled_' . uniqid() . '.png';
-        Storage::put('public/' . $imageName, $imageContents);
-
-        // Save the image information to the database
-        $image = CPImageGeneration::create([
-            'prompt' => 'Upscaled Image',
-            'generated_image' => $imageName,
-            'midjourney_message_id' => $newMessageId,
-        ]);
-
-        return response()->json(['success' => true, 'id' => $image->id]);
-    } catch (\Exception $e) {
-        Log::error('Error upscaling image', [
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-        ]);
-        return response()->json(['error' => 'Failed to upscale image.'], 500);
     }
-}
-
     
     public function showUpscaledImage(Request $request)
-{
-    $imageUrl = $request->input('image_url');
+    {
+        $imageUrl = $request->input('image_url');
 
-    if (!$imageUrl) {
-        return redirect()->route('cp_image_generation.index')->with('error', 'No upscaled image URL provided.');
+        if (!$imageUrl) {
+            return redirect()->route('cp_image_generation.index')->with('error', 'No upscaled image URL provided.');
+        }
+
+        return view('cp_image_generation.upscaled', ['imageUrl' => $imageUrl]);
     }
 
-    return view('cp_image_generation.upscaled', ['imageUrl' => $imageUrl]);
-}
+    public function showCropped($id)
+    {
+        $image = CPImageGeneration::findOrFail($id);
+        return view('cp_image_generation.cropped', compact('image'));
+    }
 
-public function showCropped($id)
-{
-    $image = CPImageGeneration::findOrFail($id);
-    return view('cp_image_generation.cropped', compact('image'));
-}
-public function createProduct(Request $request)
-{
-    $image = CPImageGeneration::findOrFail($request->input('image_id'));
-    $user = auth()->user();
+    public function createProduct(Request $request)
+    {
+        $image = CPImageGeneration::findOrFail($request->input('image_id'));
+        $user = auth()->user();
 
-    try {
-        $woocommerce = new Client(
-            env('WOOCOMMERCE_STORE_URL'),
-            env('WOOCOMMERCE_CONSUMER_KEY'),
-            env('WOOCOMMERCE_CONSUMER_SECRET'),
-            [
-                'version' => 'wc/v3',
-            ]
-        );
-
-        $relativeUrl = Storage::url($image->generated_image);
-        $publicUrl = url($relativeUrl);
-
-        // Log the public URL for debugging
-        Log::info("Public URL: " . $publicUrl);
-
-        $data = [
-            'name' => $request->input('title'),
-            'description' => $request->input('description'),
-            'images' => [
+        try {
+            $woocommerce = new Client(
+                env('WOOCOMMERCE_STORE_URL'),
+                env('WOOCOMMERCE_CONSUMER_KEY'),
+                env('WOOCOMMERCE_CONSUMER_SECRET'),
                 [
-                    'src' => $publicUrl
+                    'version' => 'wc/v3',
                 ]
-            ],
-            'type' => 'simple',
-            'regular_price' => '19.99',
-        ];
+            );
 
-        $product = $woocommerce->post('products', $data);
+            $relativeUrl = Storage::url($image->generated_image);
+            $publicUrl = url($relativeUrl);
 
-        // Save the product information to the database
-        PublishedProduct::create([
-            'image_id' => $image->id,
-            'user_id' => $user->id,
-            'title' => $request->input('title'),
-            'description' => $request->input('description'),
-            'product_id' => $product->id,
-            'product_url' => $product->permalink,
-            'cropped_image' => $image->generated_image, // Assuming the cropped image is stored here
-        ]);
+            // Log the public URL for debugging
+            Log::info("Public URL: " . $publicUrl);
 
-        // Get the product URL
-        $productUrl = $product->permalink;
-        return redirect($productUrl);
+            $data = [
+                'name' => $request->input('title'),
+                'description' => $request->input('description'),
+                'images' => [
+                    [
+                        'src' => $publicUrl
+                    ]
+                ],
+                'type' => 'simple',
+                'regular_price' => '19.99',
+            ];
 
-    } catch (HttpClientException $e) {
-        $error = $e->getMessage();
-        Log::error("Error creating product: cURL Error: $error");
-        return back()->with('error', $error);
+            $product = $woocommerce->post('products', $data);
+
+            // Save the product information to the database
+            PublishedProduct::create([
+                'image_id' => $image->id,
+                'user_id' => $user->id,
+                'title' => $request->input('title'),
+                'description' => $request->input('description'),
+                'product_id' => $product->id,
+                'product_url' => $product->permalink,
+                'cropped_image' => $image->generated_image, // Assuming the cropped image is stored here
+            ]);
+
+            // Get the product URL
+            $productUrl = $product->permalink;
+            return redirect($productUrl);
+
+        } catch (HttpClientException $e) {
+            $error = $e->getMessage();
+            Log::error("Error creating product: cURL Error: $error");
+            return back()->with('error', $error);
+        }
     }
-}
 
-public function puzzleFeed()
-{
-    $publishedProducts = PublishedProduct::with('user')->get();
-    return view('cp_image_generation.puzzle_feed', compact('publishedProducts'));
-}
+    public function puzzleFeed()
+    {
+        $publishedProducts = PublishedProduct::with('user')->get();
+        return view('cp_image_generation.puzzle_feed', compact('publishedProducts'));
+    }
 
-
-public function crop(Request $request)
+    public function crop(Request $request)
     {
         Log::info('Cropping image request received', ['request' => $request->all()]);
 
