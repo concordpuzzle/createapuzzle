@@ -320,7 +320,7 @@ public function createProduct(Request $request)
                 ],
                 [
                     'role' => 'user',
-                    'content' => "Create a unique title and description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle'. The description should explain the image based on the prompt, acknowledge that the puzzle was made by {$userName} and that it was made on the Make a Puzzle platform. Title should be succinct and descriptive."
+                    'content' => "Create a unique title and description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle'. The description should explain the image based on the prompt, acknowledge that the puzzle was made by {$userName} and that it was made on the Make a Puzzle platform. The descriptive should be very clear and concise, explaining exactly what the image is. The pieces are high quality, ribbon cut. No marketing language. Title should be succinct and descriptive."
                 ]
             ],
             'max_tokens' => 100,
