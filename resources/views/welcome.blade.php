@@ -5,7 +5,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <title>Laravel</title>
-        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -139,10 +138,11 @@
                 </div>
 <!-- Popular Community Made Puzzles Section -->
 <!-- Popular Community Made Puzzles Section -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 <div class="mt-16">
-    <h2 class="mb-4" style="font-size: 33px; color: #b71540;" class="arvo-bold">Popular Community Made Puzzles</h2>
+    <h2 class="mb-4 arvo-bold" style="font-size: 33px; color: #b71540;">Popular Community Made Puzzles</h2>
     <div class="container">
-        <div class="row">
+        <div class="row justify-content-center">
             @foreach($popularProducts as $product)
                 <div class="col-md-3 mb-4 d-flex align-items-stretch">
                     <div class="card h-100 shadow-sm" style="width: 18rem;">
@@ -195,7 +195,6 @@
         });
     }
 </script>
-
 
                 <div class="flex justify-center mt-16 px-0 sm:items-center">
                     <div class="text-center text-sm sm:text-left">
