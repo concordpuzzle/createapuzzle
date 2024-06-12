@@ -405,51 +405,56 @@ public function puzzleFeed()
 
 
 public function crop(Request $request)
-    {
-        Log::info('Cropping image request received', ['request' => $request->all()]);
+{
+    Log::info('Cropping image request received', ['request' => $request->all()]);
 
-        $request->validate([
-            'cropped_image' => 'required|image',
+    $request->validate([
+        'cropped_image' => 'required|image',
+        'original_image_id' => 'required|integer', // Ensure original image ID is provided
+    ]);
+
+    try {
+        $croppedImage = $request->file('cropped_image');
+        Log::info('Cropped image file details', ['file' => $croppedImage]);
+
+        $path = $croppedImage->store('public/generated_images');
+        Log::info('Cropped image saved successfully', ['path' => $path]);
+
+        // Remove 'public/' from the path before storing in the database
+        $storedPath = str_replace('public/', '', $path);
+
+        // Fetch the original image's prompt
+        $originalImage = CPImageGeneration::findOrFail($request->input('original_image_id'));
+        
+        // Save cropped image information to database
+        $image = CPImageGeneration::create([
+            'user_id' => auth()->user()->id, // Associate with the authenticated user
+            'prompt' => $originalImage->prompt, // Retain the original prompt
+            'generated_image' => $storedPath,
         ]);
 
-        try {
-            $croppedImage = $request->file('cropped_image');
-            Log::info('Cropped image file details', ['file' => $croppedImage]);
+        // Generate AI title and description
+        $aiResponse = $this->generateTitleAndDescription($storedPath);
+        $title = $aiResponse['title'];
+        $description = $aiResponse['description'];
 
-            $path = $croppedImage->store('public/generated_images');
-            Log::info('Cropped image saved successfully', ['path' => $path]);
-
-            // Remove 'public/' from the path before storing in the database
-            $storedPath = str_replace('public/', '', $path);
-
-            // Save cropped image information to database
-            $image = CPImageGeneration::create([
-                'prompt' => 'Cropped Image',
-                'generated_image' => $storedPath,
-            ]);
-
-            // Generate AI title and description
-            $aiResponse = $this->generateTitleAndDescription($storedPath);
-            $title = $aiResponse['title'];
-            $description = $aiResponse['description'];
-
-            return response()->json([
-                'success' => true,
-                'id' => $image->id,
-                'path' => Storage::url($storedPath),
-                'title' => $title,
-                'description' => $description,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error during image cropping', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-            ]);
-            return response()->json(['success' => false, 'error' => $e->getMessage()]);
-        }
+        return response()->json([
+            'success' => true,
+            'id' => $image->id,
+            'path' => Storage::url($storedPath),
+            'title' => $title,
+            'description' => $description,
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error during image cropping', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ]);
+        return response()->json(['success' => false, 'error' => $e->getMessage()]);
     }
+}
 
     private function generateTitleAndDescription($imagePath)
     {
