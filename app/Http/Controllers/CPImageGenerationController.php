@@ -320,7 +320,7 @@ public function createProduct(Request $request)
                 ],
                 [
                     'role' => 'user',
-                    'content' => "Create a unique title and description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle:'. The description should explain the image based on the prompt, acknowledge that the puzzle was made by {$userName} and that it was made on the Make a Puzzle platform. Title should be succinct and descriptive. Whenever Make a Puzzle platform shows up, make it a link, <a target='_blank' href='https://make.concordpuzzle.com'>Make a Puzzle</a>"
+                    'content' => "Create a unique title and description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle'. The description should explain the image based on the prompt, acknowledge that the puzzle was made by {$userName} and that it was made on the Make a Puzzle platform. Title should be succinct and descriptive."
                 ]
             ],
             'max_tokens' => 100,
@@ -342,7 +342,7 @@ public function createProduct(Request $request)
         $description = str_replace('Description:', '', implode(' ', array_slice($generatedLines, 1)));
 
         // Add the custom message to the description
-        $description .= " This puzzle was made by {$userName} on the Make a Puzzle platform.";
+        $description .= " This puzzle was made by {$userName} on the Make a Puzzle platform.)";
 
         $woocommerce = new Client(
             env('WOOCOMMERCE_STORE_URL'),
