@@ -2,7 +2,8 @@
 
 @section('content')
 <div class="container text-center">
-    <h1 class="page-title">Your New Puzzle</h1>
+    <h1 class="page-title">Your New 500 Piece Puzzle!</h1>
+    <p>To purchase it, publish to ConcordPuzzle.com with the button below.</p>
     <div class="card mb-4 shadow-sm mx-auto" style="max-width: 600px;">
         <img src="{{ Storage::url($image->generated_image) }}" class="card-img-top rounded-image" alt="Cropped Image">
         <div class="card-body">
