@@ -316,7 +316,7 @@ public function createProduct(Request $request)
             'messages' => [
                 [
                     'role' => 'system',
-                    'content' => 'You are a creative assistant who generates titles and descriptions for products.'
+                    'content' => 'You are a creative assistant who generates straightforward titles and descriptions for products, without useless adjectives.'
                 ],
                 [
                     'role' => 'user',
