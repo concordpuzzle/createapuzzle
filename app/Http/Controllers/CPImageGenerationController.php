@@ -484,30 +484,31 @@ public function crop(Request $request)
     }
 
     public function likeProduct(Request $request)
-    {
-        $productId = $request->input('product_id');
-        $userId = auth()->user()->id;
-    
-        // Check if the user already liked this product
-        $existingLike = Like::where('user_id', $userId)->where('product_id', $productId)->first();
-    
-        if ($existingLike) {
-            return response()->json(['success' => false, 'message' => 'You already liked this product']);
-        }
-    
-        // Add a new like
-        Like::create([
-            'user_id' => $userId,
-            'product_id' => $productId
-        ]);
-    
-        // Update the likes count on the product
-        $product = PublishedProduct::find($productId);
-        $product->likes_count = $product->likes->count();
-        $product->save();
-    
-        return response()->json(['success' => true, 'likes_count' => $product->likes_count]);
+{
+    $productId = $request->input('product_id');
+    $userId = auth()->user()->id;
+
+    // Check if the user already liked this product
+    $existingLike = Like::where('user_id', $userId)->where('product_id', $productId)->first();
+
+    if ($existingLike) {
+        return response()->json(['success' => false, 'message' => 'You already liked this product']);
     }
+
+    // Add a new like
+    Like::create([
+        'user_id' => $userId,
+        'product_id' => $productId
+    ]);
+
+    // Update the likes count on the product
+    $product = PublishedProduct::find($productId);
+    $product->likes_count = $product->likes->count();
+    $product->save();
+
+    return response()->json(['success' => true, 'likes_count' => $product->likes_count]);
+}
+
     
 
 }

@@ -31,6 +31,10 @@
     .like-button.liked {
         color: #ff0000;
     }
+    .like-count {
+        font-style: italic;
+        font-size: 9px;
+    }
 </style>
 
 <div class="container text-center my-5">
@@ -41,12 +45,16 @@
                 <div class="card h-100 shadow-sm">
                     <img src="{{ Storage::url($product->cropped_image) }}" class="card-img-top" alt="{{ $product->title }}" style="border-radius: 4px;">
                     <div class="card-body d-flex flex-column">
-                        <h5 class="card-title radio-canada-big">{{ $product->title }}</h5>
-                        <div class="mt-auto">
-                            <span id="like-count-{{ $product->id }}">{{ $product->likes->count() }}</span>
-                            <button class="like-button" onclick="likeProduct({{ $product->id }}, this)">
-                                <i class="fa fa-heart"></i>
+                        <h5 class="card-title radio-canada-big">
+                            {{ $product->title }}
+                            <button class="like-button {{ $product->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" onclick="likeProduct({{ $product->id }}, this)">
+                                <i class="fa fa-heart{{ $product->likes->contains('user_id', auth()->id()) ? '' : '-o' }}"></i>
                             </button>
+                        </h5>
+                        <div class="like-count">
+                            <span id="like-count-{{ $product->id }}">{{ $product->likes->count() }}</span> people like this
+                        </div>
+                        <div class="mt-auto">
                             <a href="{{ $product->product_url }}" class="btn btn-danger btn-block mt-2" target="_blank">View Product</a>
                         </div>
                     </div>
@@ -72,6 +80,8 @@
                     const likeCountElement = document.getElementById('like-count-' + productId);
                     likeCountElement.textContent = response.likes_count;
                     button.classList.add('liked');
+                    button.querySelector('i').classList.remove('fa-heart-o');
+                    button.querySelector('i').classList.add('fa-heart');
                     button.setAttribute('disabled', 'true');
                 } else {
                     alert(response.message);
