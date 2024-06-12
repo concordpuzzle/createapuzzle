@@ -320,7 +320,7 @@ public function createProduct(Request $request)
                 ],
                 [
                     'role' => 'user',
-                    'content' => "Create a unique title and description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle:'. The description should explain the image based on the prompt, acknowledge that the puzzle was made by {$userName} and that it was made on the Make a Puzzle platform. Title should be succinct and descriptive."
+                    'content' => "Create a unique title and description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle:'. The description should explain the image based on the prompt, acknowledge that the puzzle was made by {$userName} and that it was made on the Make a Puzzle platform. Title should be succinct and descriptive. Whenever Make a Puzzle platform shows up, make it a link, <a target='_blank' href='https://make.concordpuzzle.com'>Make a Puzzle</a>"
                 ]
             ],
             'max_tokens' => 100,
@@ -338,7 +338,7 @@ public function createProduct(Request $request)
         // Extract title and description
         $generatedLines = explode("\n", trim($generatedText));
         $title = str_replace('Title:', '', $generatedLines[0]);
-        $title = str_replace('"', '', $title) . ' 500 Piece Puzzle';
+        $title = str_replace('"', '', $title);
         $description = str_replace('Description:', '', implode(' ', array_slice($generatedLines, 1)));
 
         // Add the custom message to the description
