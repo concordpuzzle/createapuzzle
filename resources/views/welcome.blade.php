@@ -134,14 +134,7 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="flex justify-center mt-16 px-0 sm:items-center">
-                    <div class="text-center text-sm sm:text-left">
-                       <center> &copy; Concord Puzzle<br>A Massachusetts Puzzle Company e.2023 </center>
-                    </div>
-                </div>
-            </div>
-            <!-- Popular Community Made Puzzles Section -->
+<!-- Popular Community Made Puzzles Section -->
 <div class="mt-16">
     <h2 class="mb-4" style="font-size: 33px; color: #b71540;" class="arvo-bold">Popular Community Made Puzzles</h2>
     <div class="row justify-content-center">
@@ -169,6 +162,12 @@
     </div>
 </div>
 
+                <div class="flex justify-center mt-16 px-0 sm:items-center">
+                    <div class="text-center text-sm sm:text-left">
+                       <center> &copy; Concord Puzzle<br>A Massachusetts Puzzle Company e.2023 </center>
+                    </div>
+                </div>
+            </div>
         </div>
     </body>
 </html>
