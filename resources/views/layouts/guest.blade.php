@@ -39,7 +39,11 @@
                     @endauth
                 </div>
             @endif
+            <div class="flex justify-center">
+                    <a href="https://make.concordpuzzle.com"> <div style="color:#b71540;font-size:44px;" class="arvo-bold">Make a Puzzle</div></a>
+                </div>
         <div class="font-sans text-gray-900 antialiased">
+            
         @yield('content')
         </div>
 
