@@ -22,7 +22,7 @@ class CPImageGenerationController extends Controller
     {
         $userId = auth()->user()->id;
         $images = CPImageGeneration::where('user_id', $userId)
-            ->orderBy('created_at', 'asc')
+            ->orderBy('created_at', 'desc')
             ->get();
 
         return view('cp_image_generation.index', compact('images'));
