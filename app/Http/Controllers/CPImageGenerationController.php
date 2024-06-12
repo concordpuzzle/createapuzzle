@@ -1,7 +1,5 @@
 <?php 
 // app/Http/Controllers/CPImageGenerationController.php
-// app/Http/Controllers/CPImageGenerationController.php
-// app/Http/Controllers/CPImageGenerationController.php
 
 namespace App\Http\Controllers;
 
@@ -12,9 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Automattic\WooCommerce\Client;
 use Automattic\WooCommerce\HttpClient\HttpClientException;
-use App\Models\PublishedProduct; // Add this at the top of your controller
-
-
+use App\Models\PublishedProduct;
 
 class CPImageGenerationController extends Controller
 {
@@ -28,20 +24,15 @@ class CPImageGenerationController extends Controller
         return view('cp_image_generation.index', compact('images'));
     }
 
-
-    // app/Http/Controllers/CPImageGenerationController.php
-
-public function publishedPuzzles()
-{
-    $userId = auth()->user()->id;
-    $publishedProducts = PublishedProduct::where('user_id', $userId)
+    public function publishedPuzzles()
+    {
+        $userId = auth()->user()->id;
+        $publishedProducts = PublishedProduct::where('user_id', $userId)
                             ->orderBy('created_at', 'desc')
                             ->get();
 
-    return view('cp_image_generation.published_puzzles', compact('publishedProducts'));
-}
-
-
+        return view('cp_image_generation.published_puzzles', compact('publishedProducts'));
+    }
 
     public function store(Request $request)
     {
@@ -157,28 +148,27 @@ public function publishedPuzzles()
             return redirect()->route('cp_image_generation.index')->with('error', 'Failed to generate image.');
         }
     }
-    
+
     public function showUpscaled($id)
     {
         $image = CPImageGeneration::findOrFail($id);
         return view('cp_image_generation.upscaled', compact('image'));
     }
-    
 
     public function upscale(Request $request)
     {
         Log::info('Upscale request received', ['request' => $request->all()]);
-    
+
         $request->validate([
             'button' => 'required|string',
             'message_id' => 'required|string|max:40',
         ]);
-    
+
         $button = $request->input('button');
         $messageId = $request->input('message_id');
         $apiKey = env('MIDJOURNEY_API_TOKEN');
         $apiUrl = env('MIDJOURNEY_API_URL');
-    
+
         if (!$apiUrl || !$apiKey) {
             Log::error('MidJourney API URL or Token is not set', [
                 'apiUrl' => $apiUrl,
@@ -186,7 +176,7 @@ public function publishedPuzzles()
             ]);
             return response()->json(['error' => 'MidJourney API URL or Token is not set.'], 500);
         }
-    
+
         try {
             // Send the upscale request to MidJourney API
             $apiEndpoint = $apiUrl . '/api/v1/midjourney/button';
@@ -196,7 +186,7 @@ public function publishedPuzzles()
                 'button' => $button,
                 'headers' => ['Authorization' => 'Bearer ' . $apiKey]
             ]);
-    
+
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
                 'Content-Type' => 'application/json'
@@ -204,38 +194,38 @@ public function publishedPuzzles()
                 'messageId' => $messageId,
                 'button' => $button,
             ]);
-    
+
             Log::info('MidJourney API upscale response', [
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
-    
+
             if ($response->failed()) {
                 throw new \Exception('Failed to get a successful response from MidJourney API: ' . $response->body());
             }
-    
+
             // Assuming the API returns a new messageId for the upscaled image
             $newMessageId = $response->json()['messageId'];
-    
+
             // Polling mechanism to check the upscale status
             $progressUrl = $apiUrl . '/api/v1/midjourney/message/' . $newMessageId;  // Corrected endpoint
             $upscaledImageUrl = null;
-    
+
             for ($i = 0; $i < 30; $i++) { // Increase the number of retries to allow more time for processing
                 sleep(10); // Wait for 10 seconds before checking the status again
-    
+
                 $progressResponse = Http::withHeaders([
                     'Authorization' => 'Bearer ' . $apiKey,
                     'Content-Type' => 'application/json'
                 ])->get($progressUrl);
-    
+
                 Log::info('Upscale progress response from MidJourney API', [
                     'status' => $progressResponse->status(),
                     'body' => $progressResponse->body(),
                 ]);
-    
+
                 $progressData = $progressResponse->json();
-    
+
                 if (isset($progressData['status'])) {
                     if ($progressData['status'] === 'DONE' && isset($progressData['uri'])) {
                         $upscaledImageUrl = $progressData['uri'];
@@ -251,16 +241,16 @@ public function publishedPuzzles()
                     throw new \Exception('Unexpected response: ' . $progressResponse->body());
                 }
             }
-    
+
             if (!$upscaledImageUrl) {
                 throw new \Exception('Failed to get upscaled image URL after polling.');
             }
-    
+
             // Store the upscaled image locally
             $imageContents = file_get_contents($upscaledImageUrl);
             $imageName = 'generated_images/upscaled_' . uniqid() . '.png';
             Storage::put('public/' . $imageName, $imageContents);
-    
+
             // Save the image information to the database with the original prompt
             $originalImage = CPImageGeneration::where('midjourney_message_id', $messageId)->first();
             $image = CPImageGeneration::create([
@@ -269,7 +259,7 @@ public function publishedPuzzles()
                 'generated_image' => $imageName,
                 'midjourney_message_id' => $newMessageId,
             ]);
-    
+
             return response()->json(['success' => true, 'id' => $image->id]);
         } catch (\Exception $e) {
             Log::error('Error upscaling image', [
@@ -281,130 +271,129 @@ public function publishedPuzzles()
             return response()->json(['error' => 'Failed to upscale image.'], 500);
         }
     }
-    
+
     public function showUpscaledImage(Request $request)
-{
-    $imageUrl = $request->input('image_url');
+    {
+        $imageUrl = $request->input('image_url');
 
-    if (!$imageUrl) {
-        return redirect()->route('cp_image_generation.index')->with('error', 'No upscaled image URL provided.');
-    }
-
-    return view('cp_image_generation.upscaled', ['imageUrl' => $imageUrl]);
-}
-
-public function showCropped($id)
-{
-    $image = CPImageGeneration::findOrFail($id);
-    return view('cp_image_generation.cropped', compact('image'));
-}
-public function createProduct(Request $request)
-{
-    $image = CPImageGeneration::findOrFail($request->input('image_id'));
-    $user = auth()->user();
-    $prompt = $image->prompt;
-
-    try {
-        // Call OpenAI API to generate a title and description
-        $openaiApiKey = env('OPENAI_API_KEY');
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $openaiApiKey,
-            'Content-Type' => 'application/json'
-        ])->post('https://api.openai.com/v1/chat/completions', [
-            'model' => 'gpt-3.5-turbo',
-            'messages' => [
-                [
-                    'role' => 'system',
-                    'content' => 'You are a creative assistant who generates titles and descriptions for products.'
-                ],
-                [
-                    'role' => 'user',
-                    'content' => "Create a unique title and description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle:'"
-                ]
-            ],
-            'max_tokens' => 100,
-            'n' => 1,
-            'stop' => ['\n']
-        ]);
-
-        if ($response->failed()) {
-            throw new \Exception('Failed to get a successful response from OpenAI API: ' . $response->body());
+        if (!$imageUrl) {
+            return redirect()->route('cp_image_generation.index')->with('error', 'No upscaled image URL provided.');
         }
 
-        $openaiResult = $response->json();
-        $generatedText = $openaiResult['choices'][0]['message']['content'];
-        $generatedLines = explode("\n", trim($generatedText));
-        $title = $generatedLines[0] . ' 500 Piece Puzzle';
-        $description = implode(' ', array_slice($generatedLines, 1));
-
-        $woocommerce = new Client(
-            env('WOOCOMMERCE_STORE_URL'),
-            env('WOOCOMMERCE_CONSUMER_KEY'),
-            env('WOOCOMMERCE_CONSUMER_SECRET'),
-            [
-                'version' => 'wc/v3',
-            ]
-        );
-
-        $relativeUrl = Storage::url($image->generated_image);
-        $publicUrl = url($relativeUrl);
-
-        // Log the public URL for debugging
-        Log::info("Public URL: " . $publicUrl);
-
-        $data = [
-            'name' => $title,
-            'description' => $description,
-            'images' => [
-                [
-                    'src' => $publicUrl
-                ]
-            ],
-            'type' => 'simple',
-            'regular_price' => '19.99',
-        ];
-
-        $product = $woocommerce->post('products', $data);
-
-        // Save the product information to the database
-        PublishedProduct::create([
-            'image_id' => $image->id,
-            'user_id' => $user->id,
-            'title' => $title,
-            'description' => $description,
-            'product_id' => $product->id,
-            'product_url' => $product->permalink,
-            'cropped_image' => $image->generated_image, // Assuming the cropped image is stored here
-        ]);
-
-        // Get the product URL
-        $productUrl = $product->permalink;
-        return redirect($productUrl);
-
-    } catch (HttpClientException $e) {
-        $error = $e->getMessage();
-        Log::error("Error creating product: cURL Error: $error");
-        return back()->with('error', $error);
-    } catch (\Exception $e) {
-        Log::error('Error generating title and description', [
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-        ]);
-        return back()->with('error', 'Failed to generate title and description.');
+        return view('cp_image_generation.upscaled', ['imageUrl' => $imageUrl]);
     }
-}
 
+    public function showCropped($id)
+    {
+        $image = CPImageGeneration::findOrFail($id);
+        return view('cp_image_generation.cropped', compact('image'));
+    }
 
-public function puzzleFeed()
-{
-    $publishedProducts = PublishedProduct::with('user')->get();
-    return view('cp_image_generation.puzzle_feed', compact('publishedProducts'));
-}
+    public function createProduct(Request $request)
+    {
+        $image = CPImageGeneration::findOrFail($request->input('image_id'));
+        $user = auth()->user();
+        $prompt = $image->prompt;
 
+        try {
+            // Call OpenAI API to generate a title and description
+            $openaiApiKey = env('OPENAI_API_KEY');
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $openaiApiKey,
+                'Content-Type' => 'application/json'
+            ])->post('https://api.openai.com/v1/chat/completions', [
+                'model' => 'gpt-3.5-turbo',
+                'messages' => [
+                    [
+                        'role' => 'system',
+                        'content' => 'You are a creative assistant who generates titles and descriptions for products.'
+                    ],
+                    [
+                        'role' => 'user',
+                        'content' => "Create a unique title and description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle:'"
+                    ]
+                ],
+                'max_tokens' => 100,
+                'n' => 1,
+                'stop' => ['\n']
+            ]);
 
-public function crop(Request $request)
+            if ($response->failed()) {
+                throw new \Exception('Failed to get a successful response from OpenAI API: ' . $response->body());
+            }
+
+            $openaiResult = $response->json();
+            $generatedText = $openaiResult['choices'][0]['message']['content'];
+            $generatedLines = explode("\n", trim($generatedText));
+            $title = $generatedLines[0] . ' 500 Piece Puzzle';
+            $description = implode(' ', array_slice($generatedLines, 1));
+
+            $woocommerce = new Client(
+                env('WOOCOMMERCE_STORE_URL'),
+                env('WOOCOMMERCE_CONSUMER_KEY'),
+                env('WOOCOMMERCE_CONSUMER_SECRET'),
+                [
+                    'version' => 'wc/v3',
+                ]
+            );
+
+            $relativeUrl = Storage::url($image->generated_image);
+            $publicUrl = url($relativeUrl);
+
+            // Log the public URL for debugging
+            Log::info("Public URL: " . $publicUrl);
+
+            $data = [
+                'name' => $title,
+                'description' => $description,
+                'images' => [
+                    [
+                        'src' => $publicUrl
+                    ]
+                ],
+                'type' => 'simple',
+                'regular_price' => '19.99',
+            ];
+
+            $product = $woocommerce->post('products', $data);
+
+            // Save the product information to the database
+            PublishedProduct::create([
+                'image_id' => $image->id,
+                'user_id' => $user->id,
+                'title' => $title,
+                'description' => $description,
+                'product_id' => $product->id,
+                'product_url' => $product->permalink,
+                'cropped_image' => $image->generated_image, // Assuming the cropped image is stored here
+            ]);
+
+            // Get the product URL
+            $productUrl = $product->permalink;
+            return redirect($productUrl);
+
+        } catch (HttpClientException $e) {
+            $error = $e->getMessage();
+            Log::error("Error creating product: cURL Error: $error");
+            return back()->with('error', $error);
+        } catch (\Exception $e) {
+            Log::error('Error generating title and description', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            return back()->with('error', 'Failed to generate title and description.');
+        }
+    }
+
+    public function puzzleFeed()
+    {
+        $publishedProducts = PublishedProduct::with('user')->get();
+        return view('cp_image_generation.puzzle_feed', compact('publishedProducts'));
+    }
+
+    public function crop(Request $request)
     {
         Log::info('Cropping image request received', ['request' => $request->all()]);
 
@@ -423,8 +412,10 @@ public function crop(Request $request)
             $storedPath = str_replace('public/', '', $path);
 
             // Save cropped image information to database
+            $originalImage = CPImageGeneration::findOrFail($request->input('original_image_id'));
             $image = CPImageGeneration::create([
-                'prompt' => 'Cropped Image',
+                'user_id' => auth()->user()->id, // Associate with the authenticated user
+                'prompt' => $originalImage->prompt, // Retain the original prompt
                 'generated_image' => $storedPath,
             ]);
 
