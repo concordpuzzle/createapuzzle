@@ -411,12 +411,15 @@ public function createProduct(Request $request)
     }
 }
 
-
 public function puzzleFeed()
 {
-    $publishedProducts = PublishedProduct::with('user', 'likes')->get();
+    $publishedProducts = PublishedProduct::with('user', 'likes')
+        ->withCount('likes')
+        ->orderBy('likes_count', 'desc')
+        ->get();
     return view('cp_image_generation.puzzle_feed', compact('publishedProducts'));
 }
+
 
 
 public function crop(Request $request)
