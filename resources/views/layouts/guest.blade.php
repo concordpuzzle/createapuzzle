@@ -4,6 +4,9 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
         <style> 
 .arvo-regular {
   font-family: "Arvo", serif;
@@ -64,7 +67,7 @@
                     @endauth
                 </div>
             @endif
-            <div class="flex justify-center">
+            <div class="flex justify-center"><br>
                     <a href="https://make.concordpuzzle.com"> <div style="color:#b71540;font-size:44px;" class="arvo-bold">Make a Puzzle</div></a>
                 </div>
         <div class="font-sans text-gray-900 antialiased">
