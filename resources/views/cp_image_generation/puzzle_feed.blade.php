@@ -69,9 +69,14 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script>
     function toggleLike(productId, button) {
+        @guest
+            window.location.href = '{{ route("login") }}';
+            return;
+        @endguest
+
         const isLiked = button.classList.contains('liked');
         const url = isLiked ? '{{ route("cp_image_generation.unlike") }}' : '{{ route("cp_image_generation.like") }}';
-        
+
         $.ajax({
             url: url,
             type: 'POST',
