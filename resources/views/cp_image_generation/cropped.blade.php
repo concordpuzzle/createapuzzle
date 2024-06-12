@@ -9,7 +9,7 @@
             <form method="POST" action="{{ route('cp_image_generation.create_product') }}">
                 @csrf
                 <input type="hidden" name="image_id" value="{{ $image->id }}">
-                <button type="submit" class="btn create-puzzle-btn">Create Puzzle</button>
+                <button type="submit" class="btn create-puzzle-btn">Publish Puzzle</button>
             </form>
         </div>
     </div>
