@@ -342,7 +342,7 @@ public function createProduct(Request $request)
         $description = str_replace('Description:', '', implode(' ', array_slice($generatedLines, 1)));
 
         // Add the custom message to the description
-        $description .= " This puzzle was made by {$userName} on the Make a Puzzle platform.)";
+        $description .= " This puzzle was made by {$userName} on the Make a Puzzle platform.";
 
         $woocommerce = new Client(
             env('WOOCOMMERCE_STORE_URL'),
@@ -359,6 +359,7 @@ public function createProduct(Request $request)
         // Log the public URL for debugging
         Log::info("Public URL: " . $publicUrl);
 
+        // Add the product to the WooCommerce store
         $data = [
             'name' => $title,
             'description' => $description,
@@ -368,7 +369,11 @@ public function createProduct(Request $request)
                 ]
             ],
             'type' => 'simple',
-            'regular_price' => '19.99',
+            'regular_price' => '14.93',
+            'categories' => [
+                ['id' => 1712], // Replace 123 with the ID of the "Community Made" category
+                ['id' => 17]  // Replace 456 with the ID of the "500 Piece Puzzle" category
+            ],
         ];
 
         $product = $woocommerce->post('products', $data);
