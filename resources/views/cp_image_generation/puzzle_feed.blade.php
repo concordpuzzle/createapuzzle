@@ -34,7 +34,7 @@
 </style>
 
 <div class="container text-center my-5">
-    <h1 class="display-4 mb-4 radio-canada-big">Community Made Puzzles</h1>
+    <h1 style="font-size:22px!important;" class="display-4 mb-4 radio-canada-big">Community Made Puzzles</h1>
     <div class="row">
         @foreach($publishedProducts as $product)
             <div class="col-md-3 mb-4">
@@ -43,10 +43,10 @@
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title radio-canada-big">{{ $product->title }}</h5>
                         <div class="mt-auto">
+                        <span id="like-count-{{ $product->id }}">{{ $product->likes_count ?? 0 }}</span>
                             <button class="like-button" onclick="likeProduct({{ $product->id }}, this)">
                                 <i class="fa fa-heart"></i>
                             </button>
-                            <span id="like-count-{{ $product->id }}">{{ $product->likes_count ?? 0 }}</span>
                             <a href="{{ $product->product_url }}" class="btn btn-danger btn-block mt-2" target="_blank">View Product</a>
                         </div>
                     </div>
