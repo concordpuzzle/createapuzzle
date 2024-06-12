@@ -24,6 +24,12 @@ class PublishedProduct extends Model
         return $this->belongsTo(CPImageGeneration::class, 'image_id');
     }
 
+    public function likes()
+{
+    return $this->hasMany(Like::class, 'product_id');
+}
+
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

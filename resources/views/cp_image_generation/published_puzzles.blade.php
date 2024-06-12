@@ -11,7 +11,6 @@
                     <img src="{{ Storage::url($product->cropped_image) }}" class="card-img-top" alt="{{ $product->title }}" style="border-radius: 4px;">
                     <div class="card-body">
                         <h5 class="card-title">{{ $product->title }}</h5>
-                        <p class="card-text">{{ $product->description }}</p>
                         <a href="{{ $product->product_url }}" class="btn btn-danger" style="background-color: #b71540; border-color: #b71540;">View Product</a>
                     </div>
                 </div>
