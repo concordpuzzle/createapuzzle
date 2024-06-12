@@ -15,9 +15,8 @@ use App\Http\Controllers\ImageGenerationController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [CPImageGenerationController::class, 'welcomeFeed'])->name('welcome');
+
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])
     ->group(function () {

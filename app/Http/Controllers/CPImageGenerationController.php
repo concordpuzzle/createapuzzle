@@ -510,5 +510,16 @@ public function crop(Request $request)
 }
 
     
+public function welcomeFeed()
+{
+    $publishedProducts = PublishedProduct::with('user')->get();
+    $popularProducts = PublishedProduct::with('user')
+                        ->withCount('likes')
+                        ->orderBy('likes_count', 'desc')
+                        ->take(20)
+                        ->get();
+    return view('welcome', compact('publishedProducts', 'popularProducts'));
+}
+
 
 }
