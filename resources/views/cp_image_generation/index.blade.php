@@ -55,7 +55,7 @@
         animation: spin 0.6s linear infinite;
         position: absolute;
         top: 50%;
-        left: 10%;
+        left: 50%;
         margin-top: -0.5rem;
         margin-left: -0.5rem;
     }
@@ -87,9 +87,9 @@
             </div><br>
             <input type="text" class="form-control radio-canada-big prompt-input" id="prompt" name="prompt" placeholder="Generate custom puzzle picture options with a prompt!" required><br>
         </div>
-        <button type="submit" class="btn create-button radio-canada-big">
+        <button type="submit" class="btn create-button radio-canada-big" id="createButton">
             <div class="spinner" id="mainSpinner"></div>
-            Create Puzzle Pictures
+            <span id="createButtonText">Create Puzzle Pictures</span>
         </button>
     </form>
     <br>
@@ -156,6 +156,7 @@
     }
 
     document.getElementById('imageGenerationForm').addEventListener('submit', function () {
+        document.getElementById('createButtonText').style.display = 'none';
         document.getElementById('mainSpinner').style.display = 'inline-block';
     });
 
