@@ -456,6 +456,7 @@ public function crop(Request $request)
     }
 }
 
+
     private function generateTitleAndDescription($imagePath)
     {
         // Placeholder function to generate a title and description using AI.
