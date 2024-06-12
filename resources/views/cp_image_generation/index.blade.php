@@ -96,6 +96,7 @@
     <h2 class="radio-canada-big mb-5" style="font-size: 28px;">Picture Options</h2>
     <div class="row justify-content-center">
         @foreach($images as $image)
+            @if($image->image_type == 'original')
             <div class="col-md-4 d-flex justify-content-center mb-4">
                 <div class="card shadow-sm">
                     <img src="{{ Storage::url($image->generated_image) }}" class="card-img-top" alt="{{ $image->prompt }}" style="border-radius: 4px;">
@@ -134,6 +135,7 @@
                     </div>
                 </div>
             </div>
+            @endif
         @endforeach
     </div>
 

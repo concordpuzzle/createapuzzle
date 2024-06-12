@@ -10,10 +10,7 @@ class CPImageGeneration extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'prompt',
-        'generated_image',
-        'midjourney_message_id',
+        'user_id', 'prompt', 'generated_image', 'midjourney_message_id', 'image_type'
     ];
 
     public function user()

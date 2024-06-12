@@ -144,6 +144,7 @@ public function publishedPuzzles()
                 'prompt' => $prompt,
                 'generated_image' => $imageName,
                 'midjourney_message_id' => $messageId,
+                'image_type' => 'original',
             ]);
 
             return redirect()->route('cp_image_generation.index')->with('success', 'Image generated successfully.');
@@ -268,6 +269,7 @@ public function publishedPuzzles()
                 'prompt' => $originalImage->prompt, // Retain the original prompt
                 'generated_image' => $imageName,
                 'midjourney_message_id' => $newMessageId,
+                'image_type' => 'upscaled',
             ]);
     
             return response()->json(['success' => true, 'id' => $image->id]);
@@ -443,6 +445,7 @@ public function crop(Request $request)
             'user_id' => auth()->user()->id, // Associate with the authenticated user
             'prompt' => $originalImage->prompt, // Retain the original prompt
             'generated_image' => $storedPath,
+            'image_type' => 'cropped',
         ]);
 
         // Generate AI title and description
