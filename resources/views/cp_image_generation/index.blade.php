@@ -41,6 +41,8 @@
         background-color: #b71540;
         color: white;
         position: relative;
+        padding-left: 15px;
+        padding-right: 15px;
     }
     .create-button:hover {
         color: #f5f6fa;

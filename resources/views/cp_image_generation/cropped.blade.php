@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container text-center">
-    <h1 class="page-title">Your Cropped Image</h1>
+    <h1 class="page-title">Your New Puzzle</h1>
     <div class="card mb-4 shadow-sm mx-auto" style="max-width: 600px;">
         <img src="{{ Storage::url($image->generated_image) }}" class="card-img-top rounded-image" alt="Cropped Image">
         <div class="card-body">
