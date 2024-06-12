@@ -303,6 +303,7 @@ public function createProduct(Request $request)
     $image = CPImageGeneration::findOrFail($request->input('image_id'));
     $user = auth()->user();
     $prompt = $image->prompt;
+    $userName = explode(' ', $user->name)[0]; // Get the first name of the user
 
     try {
         // Call OpenAI API to generate a title and description
@@ -319,7 +320,7 @@ public function createProduct(Request $request)
                 ],
                 [
                     'role' => 'user',
-                    'content' => "Create a unique title and description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle:'"
+                    'content' => "Create a unique title and description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle:'. The description should explain the image based on the prompt, acknowledge that the puzzle was made by {$userName} and that it was made on the Make a Puzzle platform. Title should be succinct and descriptive."
                 ]
             ],
             'max_tokens' => 100,
@@ -334,7 +335,7 @@ public function createProduct(Request $request)
         $openaiResult = $response->json();
         $generatedText = $openaiResult['choices'][0]['message']['content'];
         $generatedLines = explode("\n", trim($generatedText));
-        $title = $generatedLines[0] . ' 500 Piece Puzzle';
+        $title = rtrim($generatedLines[0], '.') . ' 500 Piece Puzzle'; // Ensure no trailing period
         $description = implode(' ', array_slice($generatedLines, 1));
 
         $woocommerce = new Client(
