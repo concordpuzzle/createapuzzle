@@ -43,7 +43,7 @@
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title radio-canada-big">{{ $product->title }}</h5>
                         <div class="mt-auto">
-                        <span id="like-count-{{ $product->id }}">{{ $product->likes_count ?? 0 }}</span>
+                            <span id="like-count-{{ $product->id }}">{{ $product->likes->count() }}</span>
                             <button class="like-button" onclick="likeProduct({{ $product->id }}, this)">
                                 <i class="fa fa-heart"></i>
                             </button>

@@ -9,29 +9,21 @@ class PublishedProduct extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'image_id',
-        'user_id',
-        'title',
-        'description',
-        'product_id',
-        'product_url',
-        'cropped_image',
-    ];
-
     public function image()
     {
         return $this->belongsTo(CPImageGeneration::class, 'image_id');
     }
 
-    public function likes()
-{
-    return $this->hasMany(Like::class, 'product_id');
-}
 
+    protected $fillable = ['image_id', 'user_id', 'title', 'description', 'product_id', 'product_url', 'cropped_image', 'likes_count'];
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class, 'product_id');
     }
 }
