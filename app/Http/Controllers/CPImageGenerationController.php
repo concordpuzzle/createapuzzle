@@ -309,9 +309,18 @@ public function createProduct(Request $request)
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $openaiApiKey,
             'Content-Type' => 'application/json'
-        ])->post('https://api.openai.com/v1/completions', [
-            'model' => 'text-davinci-003',
-            'prompt' => "Create a unique title and description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle:'",
+        ])->post('https://api.openai.com/v1/chat/completions', [
+            'model' => 'gpt-3.5-turbo',
+            'messages' => [
+                [
+                    'role' => 'system',
+                    'content' => 'You are a creative assistant who generates titles and descriptions for products.'
+                ],
+                [
+                    'role' => 'user',
+                    'content' => "Create a unique title and description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle:'"
+                ]
+            ],
             'max_tokens' => 100,
             'n' => 1,
             'stop' => ['\n']
@@ -322,7 +331,7 @@ public function createProduct(Request $request)
         }
 
         $openaiResult = $response->json();
-        $generatedText = $openaiResult['choices'][0]['text'];
+        $generatedText = $openaiResult['choices'][0]['message']['content'];
         $generatedLines = explode("\n", trim($generatedText));
         $title = $generatedLines[0] . ' 500 Piece Puzzle';
         $description = implode(' ', array_slice($generatedLines, 1));
@@ -385,6 +394,7 @@ public function createProduct(Request $request)
         return back()->with('error', 'Failed to generate title and description.');
     }
 }
+
 
 public function puzzleFeed()
 {
