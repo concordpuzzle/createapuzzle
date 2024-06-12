@@ -334,9 +334,15 @@ public function createProduct(Request $request)
 
         $openaiResult = $response->json();
         $generatedText = $openaiResult['choices'][0]['message']['content'];
+
+        // Extract title and description
         $generatedLines = explode("\n", trim($generatedText));
-        $title = rtrim($generatedLines[0], '.') . ' 500 Piece Puzzle'; // Ensure no trailing period
-        $description = implode(' ', array_slice($generatedLines, 1));
+        $title = str_replace('Title:', '', $generatedLines[0]);
+        $title = str_replace('"', '', $title) . ' 500 Piece Puzzle';
+        $description = str_replace('Description:', '', implode(' ', array_slice($generatedLines, 1)));
+
+        // Add the custom message to the description
+        $description .= " This puzzle was made by {$userName} on the Make a Puzzle platform.";
 
         $woocommerce = new Client(
             env('WOOCOMMERCE_STORE_URL'),
