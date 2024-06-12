@@ -27,6 +27,16 @@
         font-style: italic;
         font-size: 9px;
     }
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 </style>
 
 <div class="container text-center my-5">
@@ -40,10 +50,12 @@
                     </a>
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title radio-canada-big">{{ $product->title }}</h5>
+                    </div>
+                    <div class="card-footer">
                         <div class="like-count">
-                            <span id="like-count-{{ $product->id }}">{{ $product->likes->count() }}</span> people like this &middot; Click the picture to view this puzzle
+                            <span id="like-count-{{ $product->id }}">{{ $product->likes->count() }}</span> people like this &middot; Click picture for more
                         </div>
-                        <button class="like-button {{ $product->likes->contains('user_id', auth()->id()) ? 'liked' : '' }} mt-auto" onclick="likeProduct({{ $product->id }}, this)">
+                        <button class="like-button {{ $product->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" onclick="toggleLike({{ $product->id }}, this)">
                             <i class="fa fa-heart{{ $product->likes->contains('user_id', auth()->id()) ? '' : '-o' }}"></i>
                         </button>
                     </div>
@@ -56,9 +68,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script>
-    function likeProduct(productId, button) {
+    function toggleLike(productId, button) {
+        const isLiked = button.classList.contains('liked');
+        const url = isLiked ? '{{ route("cp_image_generation.unlike") }}' : '{{ route("cp_image_generation.like") }}';
+        
         $.ajax({
-            url: '{{ route("cp_image_generation.like") }}',
+            url: url,
             type: 'POST',
             data: {
                 _token: '{{ csrf_token() }}',
@@ -68,15 +83,21 @@
                 if (response.success) {
                     const likeCountElement = document.getElementById('like-count-' + productId);
                     likeCountElement.textContent = response.likes_count;
-                    button.classList.add('liked');
-                    button.querySelector('i').classList.remove('fa-heart-o');
-                    button.querySelector('i').classList.add('fa-heart');
+                    if (isLiked) {
+                        button.classList.remove('liked');
+                        button.querySelector('i').classList.remove('fa-heart');
+                        button.querySelector('i').classList.add('fa-heart-o');
+                    } else {
+                        button.classList.add('liked');
+                        button.querySelector('i').classList.remove('fa-heart-o');
+                        button.querySelector('i').classList.add('fa-heart');
+                    }
                 } else {
                     alert(response.message);
                 }
             },
             error: function(error) {
-                console.error('Error liking the product:', error);
+                console.error('Error toggling like:', error);
             }
         });
     }

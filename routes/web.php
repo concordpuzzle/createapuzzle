@@ -35,9 +35,13 @@ Route::post('/cp-image-generation/upscale', [CPImageGenerationController::class,
 Route::get('/cp-image-generation/upscaled', [CPImageGenerationController::class, 'showUpscaledImage'])->name('cp_image_generation.upscaled');
 Route::get('cp-image-generation/upscaled/{id}', [CPImageGenerationController::class, 'showUpscaled'])->name('cp_image_generation.upscaled');
 
-Route::get('/puzzle-feed', [CPImageGenerationController::class, 'puzzleFeed'])->name('puzzle_feed');
 Route::post('/like-product', [CPImageGenerationController::class, 'likeProduct'])->name('cp_image_generation.like');   
+Route::post('/unlike', [CPImageGenerationController::class, 'unlikeProduct'])->name('cp_image_generation.unlike');
+
 });
+
+Route::get('/puzzle-feed', [CPImageGenerationController::class, 'puzzleFeed'])->name('puzzle_feed');
+
 
 // Staging routes
 Route::get('/staging', [ImageGenerationController::class, 'index'])->name('staging.index');

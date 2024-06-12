@@ -510,6 +510,29 @@ public function crop(Request $request)
 }
 
     
+public function unlikeProduct(Request $request)
+{
+    $productId = $request->input('product_id');
+    $userId = auth()->user()->id;
+
+    // Check if the user already liked this product
+    $existingLike = Like::where('user_id', $userId)->where('product_id', $productId)->first();
+
+    if (!$existingLike) {
+        return response()->json(['success' => false, 'message' => 'You have not liked this product']);
+    }
+
+    // Remove the like
+    $existingLike->delete();
+
+    // Update the likes count on the product
+    $product = PublishedProduct::find($productId);
+    $product->likes_count = $product->likes->count();
+    $product->save();
+
+    return response()->json(['success' => true, 'likes_count' => $product->likes_count]);
+}
+
 public function welcomeFeed()
 {
     $publishedProducts = PublishedProduct::with('user')->get();
