@@ -166,120 +166,121 @@ public function publishedPuzzles()
     
 
     public function upscale(Request $request)
-{
-    Log::info('Upscale request received', ['request' => $request->all()]);
-
-    $request->validate([
-        'button' => 'required|string',
-        'message_id' => 'required|string|max:40',
-    ]);
-
-    $button = $request->input('button');
-    $messageId = $request->input('message_id');
-    $apiKey = env('MIDJOURNEY_API_TOKEN');
-    $apiUrl = env('MIDJOURNEY_API_URL');
-
-    if (!$apiUrl || !$apiKey) {
-        Log::error('MidJourney API URL or Token is not set', [
-            'apiUrl' => $apiUrl,
-            'apiKey' => $apiKey
+    {
+        Log::info('Upscale request received', ['request' => $request->all()]);
+    
+        $request->validate([
+            'button' => 'required|string',
+            'message_id' => 'required|string|max:40',
         ]);
-        return response()->json(['error' => 'MidJourney API URL or Token is not set.'], 500);
-    }
-
-    try {
-        // Send the upscale request to MidJourney API
-        $apiEndpoint = $apiUrl . '/api/v1/midjourney/button';
-        Log::info('Sending upscale request to MidJourney API', [
-            'url' => $apiEndpoint,
-            'messageId' => $messageId,
-            'button' => $button,
-            'headers' => ['Authorization' => 'Bearer ' . $apiKey]
-        ]);
-
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $apiKey,
-            'Content-Type' => 'application/json'
-        ])->post($apiEndpoint, [
-            'messageId' => $messageId,
-            'button' => $button,
-        ]);
-
-        Log::info('MidJourney API upscale response', [
-            'status' => $response->status(),
-            'body' => $response->body(),
-        ]);
-
-        if ($response->failed()) {
-            throw new \Exception('Failed to get a successful response from MidJourney API: ' . $response->body());
+    
+        $button = $request->input('button');
+        $messageId = $request->input('message_id');
+        $apiKey = env('MIDJOURNEY_API_TOKEN');
+        $apiUrl = env('MIDJOURNEY_API_URL');
+    
+        if (!$apiUrl || !$apiKey) {
+            Log::error('MidJourney API URL or Token is not set', [
+                'apiUrl' => $apiUrl,
+                'apiKey' => $apiKey
+            ]);
+            return response()->json(['error' => 'MidJourney API URL or Token is not set.'], 500);
         }
-
-        // Assuming the API returns a new messageId for the upscaled image
-        $newMessageId = $response->json()['messageId'];
-
-        // Polling mechanism to check the upscale status
-        $progressUrl = $apiUrl . '/api/v1/midjourney/message/' . $newMessageId;  // Corrected endpoint
-        $upscaledImageUrl = null;
-
-        for ($i = 0; $i < 30; $i++) { // Increase the number of retries to allow more time for processing
-            sleep(10); // Wait for 10 seconds before checking the status again
-
-            $progressResponse = Http::withHeaders([
+    
+        try {
+            // Send the upscale request to MidJourney API
+            $apiEndpoint = $apiUrl . '/api/v1/midjourney/button';
+            Log::info('Sending upscale request to MidJourney API', [
+                'url' => $apiEndpoint,
+                'messageId' => $messageId,
+                'button' => $button,
+                'headers' => ['Authorization' => 'Bearer ' . $apiKey]
+            ]);
+    
+            $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
                 'Content-Type' => 'application/json'
-            ])->get($progressUrl);
-
-            Log::info('Upscale progress response from MidJourney API', [
-                'status' => $progressResponse->status(),
-                'body' => $progressResponse->body(),
+            ])->post($apiEndpoint, [
+                'messageId' => $messageId,
+                'button' => $button,
             ]);
-
-            $progressData = $progressResponse->json();
-
-            if (isset($progressData['status'])) {
-                if ($progressData['status'] === 'DONE' && isset($progressData['uri'])) {
-                    $upscaledImageUrl = $progressData['uri'];
-                    break;
-                } elseif ($progressData['status'] === 'FAILED') {
-                    throw new \Exception('Upscaling failed: ' . $progressResponse->body());
-                } elseif ($progressData['status'] === 'QUEUED' || $progressData['status'] === 'PROCESSING') {
-                    continue; // Continue polling
+    
+            Log::info('MidJourney API upscale response', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+    
+            if ($response->failed()) {
+                throw new \Exception('Failed to get a successful response from MidJourney API: ' . $response->body());
+            }
+    
+            // Assuming the API returns a new messageId for the upscaled image
+            $newMessageId = $response->json()['messageId'];
+    
+            // Polling mechanism to check the upscale status
+            $progressUrl = $apiUrl . '/api/v1/midjourney/message/' . $newMessageId;  // Corrected endpoint
+            $upscaledImageUrl = null;
+    
+            for ($i = 0; $i < 30; $i++) { // Increase the number of retries to allow more time for processing
+                sleep(10); // Wait for 10 seconds before checking the status again
+    
+                $progressResponse = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Content-Type' => 'application/json'
+                ])->get($progressUrl);
+    
+                Log::info('Upscale progress response from MidJourney API', [
+                    'status' => $progressResponse->status(),
+                    'body' => $progressResponse->body(),
+                ]);
+    
+                $progressData = $progressResponse->json();
+    
+                if (isset($progressData['status'])) {
+                    if ($progressData['status'] === 'DONE' && isset($progressData['uri'])) {
+                        $upscaledImageUrl = $progressData['uri'];
+                        break;
+                    } elseif ($progressData['status'] === 'FAILED') {
+                        throw new \Exception('Upscaling failed: ' . $progressResponse->body());
+                    } elseif ($progressData['status'] === 'QUEUED' || $progressData['status'] === 'PROCESSING') {
+                        continue; // Continue polling
+                    } else {
+                        throw new \Exception('Unexpected response: ' . $progressResponse->body());
+                    }
                 } else {
                     throw new \Exception('Unexpected response: ' . $progressResponse->body());
                 }
-            } else {
-                throw new \Exception('Unexpected response: ' . $progressResponse->body());
             }
+    
+            if (!$upscaledImageUrl) {
+                throw new \Exception('Failed to get upscaled image URL after polling.');
+            }
+    
+            // Store the upscaled image locally
+            $imageContents = file_get_contents($upscaledImageUrl);
+            $imageName = 'generated_images/upscaled_' . uniqid() . '.png';
+            Storage::put('public/' . $imageName, $imageContents);
+    
+            // Save the image information to the database with the original prompt
+            $originalImage = CPImageGeneration::where('midjourney_message_id', $messageId)->first();
+            $image = CPImageGeneration::create([
+                'user_id' => auth()->user()->id, // Associate with the authenticated user
+                'prompt' => $originalImage->prompt, // Retain the original prompt
+                'generated_image' => $imageName,
+                'midjourney_message_id' => $newMessageId,
+            ]);
+    
+            return response()->json(['success' => true, 'id' => $image->id]);
+        } catch (\Exception $e) {
+            Log::error('Error upscaling image', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            return response()->json(['error' => 'Failed to upscale image.'], 500);
         }
-
-        if (!$upscaledImageUrl) {
-            throw new \Exception('Failed to get upscaled image URL after polling.');
-        }
-
-        // Store the upscaled image locally
-        $imageContents = file_get_contents($upscaledImageUrl);
-        $imageName = 'generated_images/upscaled_' . uniqid() . '.png';
-        Storage::put('public/' . $imageName, $imageContents);
-
-        // Save the image information to the database
-        $image = CPImageGeneration::create([
-            'prompt' => 'Upscaled Image',
-            'generated_image' => $imageName,
-            'midjourney_message_id' => $newMessageId,
-        ]);
-
-        return response()->json(['success' => true, 'id' => $image->id]);
-    } catch (\Exception $e) {
-        Log::error('Error upscaling image', [
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-        ]);
-        return response()->json(['error' => 'Failed to upscale image.'], 500);
     }
-}
-
     
     public function showUpscaledImage(Request $request)
 {
