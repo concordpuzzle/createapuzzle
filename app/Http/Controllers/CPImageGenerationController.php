@@ -376,7 +376,7 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
 
         // URLs of the additional images already uploaded in WordPress
         $additionalImage1 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Concord-Puzzle-2024-06-07T114127.702-768x534.png';
-        $additionalImage2 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Tight-fit.-2024-04-30T135654.378-150x150.png';
+        $additionalImage2 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Tight-fit.-2024-04-30T135654.378-416x256.png';
 
         // Add the product to the WooCommerce store
         $data = [
