@@ -46,3 +46,11 @@ Route::get('/puzzle-feed', [CPImageGenerationController::class, 'puzzleFeed'])->
 // Staging routes
 Route::get('/staging', [ImageGenerationController::class, 'index'])->name('staging.index');
 Route::post('/staging/generate', [ImageGenerationController::class, 'generate'])->name('staging.generate');
+
+Route::get('/terms', function () {
+    return view('terms');
+})->name('terms.show');
+
+Route::get('/policy', function () {
+    return view('policy');
+})->name('policy.show');
