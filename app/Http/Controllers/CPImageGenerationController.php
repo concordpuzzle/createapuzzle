@@ -309,7 +309,7 @@ public function createProduct(Request $request)
     $userName = explode(' ', $user->name)[0]; // Get the first name of the user
 
     try {
-        // Call OpenAI API to generate a title and description
+        // Call OpenAI API to generate a title and short description
         $openaiApiKey = env('OPENAI_API_KEY');
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $openaiApiKey,
@@ -323,7 +323,7 @@ public function createProduct(Request $request)
                 ],
                 [
                     'role' => 'user',
-                    'content' => "Create a unique title and description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle'. The description should explain the image based on the prompt, acknowledge that the puzzle was made by {$userName} and that it was made on the Make a Puzzle platform. The descriptive should be very clear and concise, explaining exactly what the image is. The pieces are high quality, ribbon cut. No marketing language. Title should be succinct and descriptive."
+                    'content' => "Create a unique title and short description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle'. The short description should explain the image based on the prompt, acknowledge that the puzzle was made by {$userName} and that it was made on the Make a Puzzle platform. The short description should be very clear and concise, explaining exactly what the image is. No marketing language. Title should be succinct and descriptive."
                 ]
             ],
             'max_tokens' => 100,
@@ -338,14 +338,29 @@ public function createProduct(Request $request)
         $openaiResult = $response->json();
         $generatedText = $openaiResult['choices'][0]['message']['content'];
 
-        // Extract title and description
+        // Extract title and short description
         $generatedLines = explode("\n", trim($generatedText));
         $title = str_replace('Title:', '', $generatedLines[0]);
         $title = str_replace('"', '', $title);
-        $description = str_replace('Description:', '', implode(' ', array_slice($generatedLines, 1)));
+        $shortDescription = str_replace('Description:', '', implode(' ', array_slice($generatedLines, 1)));
 
-        // Add the custom message to the description
-        $description .= " This puzzle was made by {$userName} on the Make a Puzzle platform.";
+        // Detailed Description
+        $description = "Completed puzzle dimensions: 20.5” by 15”
+Individual pieces dimensions: 0.75” by 1.25”
+Puzzle style: Ribbon cut
+Puzzle finish: High quality gloss on textured card stock
+Packaging: High quality paper sleeve and reusable box
+Shipping material: Off-white polymailer
+
+—
+
+We are Concord Puzzle, a small puzzle maker located in Concord, Massachusetts. We’re known for our dedication to crafting high-quality and engaging puzzles, with a focus on wholesome entertainment. Our unique packaging style reflects our homemade touch, and we prioritize customer interaction and feedback to continually improve our products. With a commitment to creating memorable experiences, we aim to provide joy and satisfaction to puzzle enthusiasts of all ages.
+
+<a href=\"http://rb.gy/reo16m\"><img class=\"wp-image-824 alignleft\" src=\"http://concordpuzzle.com/wp-content/uploads/2024/03/cropped-Concord-Puzzle-91-300x300.png\" alt=\"\" width=\"45\" height=\"45\" /></a>
+
+<a class=\"button product_type_simple add_to_cart_button\" href=\"http://rb.gy/reo16m\" rel=\"nofollow\" data-quantity=\"1\" aria-label=\"Add to cart: “Jaguar 500 Piece Puzzle”\" aria-describedby=\"\">Browse hundreds of puzzles</a>
+
+For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuzzle.com\">here</a>.";
 
         $woocommerce = new Client(
             env('WOOCOMMERCE_STORE_URL'),
@@ -359,17 +374,19 @@ public function createProduct(Request $request)
         $relativeUrl = Storage::url($image->generated_image);
         $publicUrl = url($relativeUrl);
 
-        // Log the public URL for debugging
-        Log::info("Public URL: " . $publicUrl);
+        // URLs of the additional images already uploaded in WordPress
+        $additionalImage1 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Concord-Puzzle-2024-06-07T114127.702-768x534.png';
+        $additionalImage2 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Tight-fit.-2024-04-30T135654.378-150x150.png';
 
         // Add the product to the WooCommerce store
         $data = [
             'name' => $title,
+            'short_description' => $shortDescription,
             'description' => $description,
             'images' => [
-                [
-                    'src' => $publicUrl
-                ]
+                ['src' => $publicUrl],
+                ['src' => $additionalImage1],
+                ['src' => $additionalImage2]
             ],
             'type' => 'simple',
             'regular_price' => '14.93',
