@@ -387,9 +387,6 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
             $mainImage->insert($overlayImage, 'center');
             $overlayedImageName = 'generated_images/overlayed_' . uniqid() . '.png';
             $mainImage->save(Storage::path('public/' . $overlayedImageName));
-            
-            $publicMainpub = Storage::url($mainImage);
-            $publicMain = url($publicMainpub);
 
             // Add the product to the WooCommerce store
             $data = [
@@ -397,7 +394,7 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
                 'short_description' => $shortDescription,
                 'description' => $description,
                 'images' => [
-                    ['src' => $publicMain],
+                    ['src' => $mainImage],
                     ['src' => $additionalImage1],
                     ['src' => $additionalImage2]
                 ],
