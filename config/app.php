@@ -187,4 +187,10 @@ return [
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
 
+    'aliases' => [
+    // Other aliases
+    'Image' => Intervention\Image\Facades\Image::class,
+],
+
+
 ];
