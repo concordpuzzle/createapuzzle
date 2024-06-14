@@ -301,8 +301,7 @@ public function showCropped($id)
     $image = CPImageGeneration::findOrFail($id);
     return view('cp_image_generation.cropped', compact('image'));
 }
-class CPImageGenerationController extends Controller
-{
+
     public function createProduct(Request $request)
     {
         $image = CPImageGeneration::findOrFail($request->input('image_id'));
@@ -441,7 +440,6 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
             return back()->with('error', 'Failed to generate title and description.');
         }
     }
-}
 
 public function puzzleFeed()
 {
