@@ -394,7 +394,7 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
                 'short_description' => $shortDescription,
                 'description' => $description,
                 'images' => [
-                    ['src' => $publicUrl],
+                    ['src' => $mainImage],
                     ['src' => $additionalImage1],
                     ['src' => $additionalImage2]
                 ],
