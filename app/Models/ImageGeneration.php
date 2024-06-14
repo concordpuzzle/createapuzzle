@@ -13,10 +13,6 @@ use OpenAI;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ImgGen extends Model
-{
-    use HasFactory;
-}
 
 class ImageGenerationControl extends Controller
 {
