@@ -301,8 +301,6 @@ public function showCropped($id)
     return view('cp_image_generation.cropped', compact('image'));
 }
 
-class CPImageGenerationController extends Controller
-{
     // Your existing methods...
 
     public function createProduct(Request $request)
@@ -439,8 +437,7 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
         }
     }
 
-    // Other methods...
-}
+    // Other methods..
 public function puzzleFeed()
 {
     $publishedProducts = PublishedProduct::with('user', 'likes')
