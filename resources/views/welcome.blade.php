@@ -124,7 +124,7 @@
 
                         <div class="scale-100 p-6 bg-white rounded-lg shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                             <div>
-                                <img src="https://concordpuzzle.com/wp-content/uploads/2024/06/Create-a-Puzzle-1.png" width="95px;"><br />
+                                <a href="https://concordpuzzle.com"><img src="https://concordpuzzle.com/wp-content/uploads/2024/06/Create-a-Puzzle-1.png" width="95px;"></a><br />
 
                                 <h2 class="text-xl font-semibold text-gray-900">By Concord Puzzle</h2>
 
