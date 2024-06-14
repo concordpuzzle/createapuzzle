@@ -301,6 +301,10 @@ public function showCropped($id)
     return view('cp_image_generation.cropped', compact('image'));
 }
 
+class CPImageGenerationController extends Controller
+{
+    // Your existing methods...
+
     public function createProduct(Request $request)
     {
         $image = CPImageGeneration::findOrFail($request->input('image_id'));
@@ -309,13 +313,8 @@ public function showCropped($id)
         $userName = explode(' ', $user->name)[0]; // Get the first name of the user
 
         try {
-            // Ensure the API key is set
-            $openaiApiKey = env('OPENAI_API_KEY');
-            if (!$openaiApiKey) {
-                throw new \Exception('OpenAI API key is not set.');
-            }
-
             // Call OpenAI API to generate a title and short description
+            $openaiApiKey = env('OPENAI_API_KEY');
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $openaiApiKey,
                 'Content-Type' => 'application/json'
@@ -367,7 +366,7 @@ We are Concord Puzzle, a small puzzle maker located in Concord, Massachusetts. W
 
 For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuzzle.com\">here</a>.";
 
-            $woocommerce = new Client(
+            $woocommerce = new \Automattic\WooCommerce\Client(
                 env('WOOCOMMERCE_STORE_URL'),
                 env('WOOCOMMERCE_CONSUMER_KEY'),
                 env('WOOCOMMERCE_CONSUMER_SECRET'),
@@ -384,8 +383,8 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
             $additionalImage2 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Tight-fit.-2024-04-30T135654.378-416x256.png';
 
             // Overlay additional image on the main image
-            $mainImage = Imagegeneration::make(Storage::path('public/' . $image->generated_image));
-            $overlayImage = Imagegeneration::make($additionalImage1)->resize($mainImage->width(), $mainImage->height());
+            $mainImage = Image::make(Storage::path('public/' . $image->generated_image));
+            $overlayImage = Image::make($additionalImage1)->resize($mainImage->width(), $mainImage->height());
             $mainImage->insert($overlayImage, 'center');
             $overlayedImageName = 'generated_images/overlayed_' . uniqid() . '.png';
             $mainImage->save(Storage::path('public/' . $overlayedImageName));
@@ -396,7 +395,7 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
                 'short_description' => $shortDescription,
                 'description' => $description,
                 'images' => [
-                    ['src' => url(Storage::url($overlayedImageName))],
+                    ['src' => $publicUrl],
                     ['src' => $additionalImage1],
                     ['src' => $additionalImage2]
                 ],
@@ -418,7 +417,7 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
                 'description' => $description,
                 'product_id' => $product->id,
                 'product_url' => $product->permalink,
-                'cropped_image' => $overlayedImageName, // Assuming the cropped image is stored here
+                'cropped_image' => $image->generated_image, // Assuming the cropped image is stored here
             ]);
 
             // Get the product URL
@@ -440,6 +439,8 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
         }
     }
 
+    // Other methods...
+}
 public function puzzleFeed()
 {
     $publishedProducts = PublishedProduct::with('user', 'likes')
