@@ -48,9 +48,6 @@
                     <a href="{{ $product->product_url }}">
                         <img src="{{ Storage::url($product->cropped_image) }}" class="card-img-top" alt="{{ $product->title }}" style="border-radius: 4px;">
                     </a>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title radio-canada-big">{{ $product->title }}</h5>
-                    </div>
                     <div class="card-footer">
                         <div class="like-count">
                             <span id="like-count-{{ $product->id }}">{{ $product->likes->count() }}</span> people like this &middot; Click picture for more
