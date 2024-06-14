@@ -382,11 +382,11 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
             $additionalImage2 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Tight-fit.-2024-04-30T135654.378-416x256.png';
 
             // Overlay additional image on the main image
-            $mainImage = Image::make(Storage::path('public/' . $image->generated_image));
+            $mainImage = Image::make(Storage::path('storage/' . $image->generated_image));
             $overlayImage = Image::make($additionalImage1)->resize($mainImage->width(), $mainImage->height());
             $mainImage->insert($overlayImage, 'center');
             $overlayedImageName = 'generated_images/overlayed_' . uniqid() . '.png';
-            $mainImage->save(Storage::path('public/' . $overlayedImageName));
+            $mainImage->save(Storage::path('storage/' . $overlayedImageName));
 
             // Add the product to the WooCommerce store
             $data = [
