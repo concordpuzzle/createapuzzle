@@ -14,7 +14,7 @@ use Automattic\WooCommerce\Client;
 use Automattic\WooCommerce\HttpClient\HttpClientException;
 use App\Models\PublishedProduct; // Add this at the top of your controller
 use App\Models\Like; // Add this line
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Facades\Image; // Ensure this is included
 
 class CPImageGenerationController extends Controller
 {
