@@ -304,51 +304,50 @@ public function showCropped($id)
     // Your existing methods...
 
     public function createProduct(Request $request)
-    {
-        
-        $image = CPImageGeneration::findOrFail($request->input('image_id'));
-        $user = auth()->user();
-        $prompt = $image->prompt;
-        $userName = explode(' ', $user->name)[0]; // Get the first name of the user
+{
+    $image = CPImageGeneration::findOrFail($request->input('image_id'));
+    $user = auth()->user();
+    $prompt = $image->prompt;
+    $userName = explode(' ', $user->name)[0]; // Get the first name of the user
 
-        try {
-            // Call OpenAI API to generate a title and short description
-            $openaiApiKey = env('OPENAI_API_KEY');
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $openaiApiKey,
-                'Content-Type' => 'application/json'
-            ])->post('https://api.openai.com/v1/chat/completions', [
-                'model' => 'gpt-3.5-turbo',
-                'messages' => [
-                    [
-                        'role' => 'system',
-                        'content' => 'You are a creative assistant who generates straightforward titles and descriptions for products, without useless adjectives.'
-                    ],
-                    [
-                        'role' => 'user',
-                        'content' => "Create a unique title and short description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle'. The short description should explain the image based on the prompt, acknowledge that the puzzle was made by {$userName} and that it was made on the Make a Puzzle platform. The short description should be very clear and concise, explaining exactly what the image is. No marketing language. Title should be succinct and descriptive."
-                    ]
+    try {
+        // Call OpenAI API to generate a title and short description
+        $openaiApiKey = env('OPENAI_API_KEY');
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $openaiApiKey,
+            'Content-Type' => 'application/json'
+        ])->post('https://api.openai.com/v1/chat/completions', [
+            'model' => 'gpt-3.5-turbo',
+            'messages' => [
+                [
+                    'role' => 'system',
+                    'content' => 'You are a creative assistant who generates straightforward titles and descriptions for products, without useless adjectives.'
                 ],
-                'max_tokens' => 100,
-                'n' => 1,
-                'stop' => ['\n']
-            ]);
+                [
+                    'role' => 'user',
+                    'content' => "Create a unique title and short description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle'. The short description should explain the image based on the prompt, acknowledge that the puzzle was made by {$userName} and that it was made on the Make a Puzzle platform. The short description should be very clear and concise, explaining exactly what the image is. No marketing language. Title should be succinct and descriptive."
+                ]
+            ],
+            'max_tokens' => 100,
+            'n' => 1,
+            'stop' => ['\n']
+        ]);
 
-            if ($response->failed()) {
-                throw new \Exception('Failed to get a successful response from OpenAI API: ' . $response->body());
-            }
+        if ($response->failed()) {
+            throw new \Exception('Failed to get a successful response from OpenAI API: ' . $response->body());
+        }
 
-            $openaiResult = $response->json();
-            $generatedText = $openaiResult['choices'][0]['message']['content'];
+        $openaiResult = $response->json();
+        $generatedText = $openaiResult['choices'][0]['message']['content'];
 
-            // Extract title and short description
-            $generatedLines = explode("\n", trim($generatedText));
-            $title = str_replace('Title:', '', $generatedLines[0]);
-            $title = str_replace('"', '', $title);
-            $shortDescription = str_replace('Description:', '', implode(' ', array_slice($generatedLines, 1)));
+        // Extract title and short description
+        $generatedLines = explode("\n", trim($generatedText));
+        $title = str_replace('Title:', '', $generatedLines[0]);
+        $title = str_replace('"', '', $title);
+        $shortDescription = str_replace('Description:', '', implode(' ', array_slice($generatedLines, 1)));
 
-            // Detailed Description
-            $description = "Completed puzzle dimensions: 20.5” by 15”
+        // Detailed Description
+        $description = "Completed puzzle dimensions: 20.5” by 15”
 Individual pieces dimensions: 0.75” by 1.25”
 Puzzle style: Ribbon cut
 Puzzle finish: High quality gloss on textured card stock
@@ -365,78 +364,102 @@ We are Concord Puzzle, a small puzzle maker located in Concord, Massachusetts. W
 
 For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuzzle.com\">here</a>.";
 
-            $woocommerce = new \Automattic\WooCommerce\Client(
-                env('WOOCOMMERCE_STORE_URL'),
-                env('WOOCOMMERCE_CONSUMER_KEY'),
-                env('WOOCOMMERCE_CONSUMER_SECRET'),
-                [
-                    'version' => 'wc/v3',
-                ]
-            );
+        $woocommerce = new \Automattic\WooCommerce\Client(
+            env('WOOCOMMERCE_STORE_URL'),
+            env('WOOCOMMERCE_CONSUMER_KEY'),
+            env('WOOCOMMERCE_CONSUMER_SECRET'),
+            [
+                'version' => 'wc/v3',
+            ]
+        );
 
-            $relativeUrl = Storage::url($image->generated_image);
-            $publicUrl = url($relativeUrl);
+        $relativeUrl = Storage::url($image->generated_image);
+        $publicUrl = url($relativeUrl);
 
-            // URLs of the additional images already uploaded in WordPress
-            $additionalImage1 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Concord-Puzzle-2024-06-07T114127.702-768x534.png';
-            $additionalImage2 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Tight-fit.-2024-04-30T135654.378-416x256.png';
+        // URLs of the additional images already uploaded in WordPress
+        $additionalImage1 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Concord-Puzzle-2024-06-07T114127.702-768x534.png';
+        $additionalImage2 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Tight-fit.-2024-04-30T135654.378-416x256.png';
 
-            // Overlay additional image on the main image
-            $mainImage = Image::make(Storage::path('public/' . $image->generated_image));
-            $overlayImage = Image::make($additionalImage1)->resize($mainImage->width(), $mainImage->height());
+        // Log the paths
+        Log::info('Main Image Path: ' . Storage::path('public/' . $image->generated_image));
+        Log::info('Additional Image 1 URL: ' . $additionalImage1);
+
+        // Overlay additional image on the main image
+        try {
+            $mainImagePath = Storage::path('public/' . $image->generated_image);
+            if (!file_exists($mainImagePath)) {
+                throw new \Exception('Main image file does not exist at path: ' . $mainImagePath);
+            }
+
+            $mainImage = Image::make($mainImagePath);
+
+            $overlayImageContents = @file_get_contents($additionalImage1);
+            if ($overlayImageContents === false) {
+                throw new \Exception('Additional image 1 URL is not accessible: ' . $additionalImage1);
+            }
+
+            $overlayImage = Image::make($overlayImageContents)->resize($mainImage->width(), $mainImage->height());
             $mainImage->insert($overlayImage, 'center');
             $overlayedImageName = 'generated_images/overlayed_' . uniqid() . '.png';
             $mainImage->save(Storage::path('public/' . $overlayedImageName));
-
-            // Add the product to the WooCommerce store
-            $data = [
-                'name' => $title,
-                'short_description' => $shortDescription,
-                'description' => $description,
-                'images' => [
-                    ['src' => $publicUrl],
-                    ['src' => $additionalImage1],
-                    ['src' => $additionalImage2]
-                ],
-                'type' => 'simple',
-                'regular_price' => '14.93',
-                'categories' => [
-                    ['id' => 1712], // Replace 123 with the ID of the "Community Made" category
-                    ['id' => 17]  // Replace 456 with the ID of the "500 Piece Puzzle" category
-                ],
-            ];
-
-            $product = $woocommerce->post('products', $data);
-
-            // Save the product information to the database
-            PublishedProduct::create([
-                'image_id' => $image->id,
-                'user_id' => $user->id,
-                'title' => $title,
-                'description' => $description,
-                'product_id' => $product->id,
-                'product_url' => $product->permalink,
-                'cropped_image' => $image->generated_image, // Assuming the cropped image is stored here
-            ]);
-
-            // Get the product URL
-            $productUrl = $product->permalink;
-            return redirect($productUrl);
-
-        } catch (HttpClientException $e) {
-            $error = $e->getMessage();
-            Log::error("Error creating product: cURL Error: $error");
-            return back()->with('error', $error);
         } catch (\Exception $e) {
-            Log::error('Error generating title and description', [
+            Log::error('Error generating overlayed image', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
-            return back()->with('error', 'Failed to generate title and description.');
         }
+
+        // Add the product to the WooCommerce store
+        $data = [
+            'name' => $title,
+            'short_description' => $shortDescription,
+            'description' => $description,
+            'images' => [
+                ['src' => $publicUrl],
+                ['src' => $additionalImage1],
+                ['src' => $additionalImage2]
+            ],
+            'type' => 'simple',
+            'regular_price' => '14.93',
+            'categories' => [
+                ['id' => 1712], // Replace with the ID of the "Community Made" category
+                ['id' => 17]  // Replace with the ID of the "500 Piece Puzzle" category
+            ],
+        ];
+
+        $product = $woocommerce->post('products', $data);
+
+        // Save the product information to the database
+        PublishedProduct::create([
+            'image_id' => $image->id,
+            'user_id' => $user->id,
+            'title' => $title,
+            'description' => $description,
+            'product_id' => $product->id,
+            'product_url' => $product->permalink,
+            'cropped_image' => $image->generated_image, // Assuming the cropped image is stored here
+        ]);
+
+        // Get the product URL
+        $productUrl = $product->permalink;
+        return redirect($productUrl);
+
+    } catch (HttpClientException $e) {
+        $error = $e->getMessage();
+        Log::error("Error creating product: cURL Error: $error");
+        return back()->with('error', $error);
+    } catch (\Exception $e) {
+        Log::error('Error generating title and description', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ]);
+        return back()->with('error', 'Failed to generate title and description.');
     }
+}
 
     // Other methods..
 public function puzzleFeed()
