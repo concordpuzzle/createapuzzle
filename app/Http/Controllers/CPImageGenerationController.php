@@ -300,90 +300,87 @@ public function showCropped($id)
     $image = CPImageGeneration::findOrFail($id);
     return view('cp_image_generation.cropped', compact('image'));
 }
+public function createProduct(Request $request)
+{
+    $image = CPImageGeneration::findOrFail($request->input('image_id'));
+    $user = auth()->user();
+    $prompt = $image->prompt;
+    $userName = explode(' ', $user->name)[0]; // Get the first name of the user
 
-    // Your existing methods...
-    public function createProduct(Request $request)
-    {
-        $image = CPImageGeneration::findOrFail($request->input('image_id'));
-        $user = auth()->user();
-        $prompt = $image->prompt;
-        $userName = explode(' ', $user->name)[0]; // Get the first name of the user
-    
-        try {
-            // Call OpenAI API to generate a title and short description
-            $openaiApiKey = env('OPENAI_API_KEY');
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $openaiApiKey,
-                'Content-Type' => 'application/json'
-            ])->post('https://api.openai.com/v1/chat/completions', [
-                'model' => 'gpt-3.5-turbo',
-                'messages' => [
-                    [
-                        'role' => 'system',
-                        'content' => 'You are a creative assistant who generates straightforward titles and descriptions for products, without useless adjectives.'
-                    ],
-                    [
-                        'role' => 'user',
-                        'content' => "Create a unique title and short description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle'. The short description should explain the image based on the prompt, acknowledge that the puzzle was made by {$userName} and that it was made on the Make a Puzzle platform. The short description should be very clear and concise, explaining exactly what the image is. No marketing language. Title should be succinct and descriptive."
-                    ]
-                ],
-                'max_tokens' => 100,
-                'n' => 1,
-                'stop' => ['\n']
-            ]);
-    
-            if ($response->failed()) {
-                throw new \Exception('Failed to get a successful response from OpenAI API: ' . $response->body());
-            }
-    
-            $openaiResult = $response->json();
-            $generatedText = $openaiResult['choices'][0]['message']['content'];
-    
-            // Extract title and short description
-            $generatedLines = explode("\n", trim($generatedText));
-            $title = str_replace('Title:', '', $generatedLines[0]);
-            $title = str_replace('"', '', $title);
-            $shortDescription = str_replace('Description:', '', implode(' ', array_slice($generatedLines, 1)));
-    
-            // Detailed Description
-            $description = "Completed puzzle dimensions: 20.5” by 15”
-    Individual pieces dimensions: 0.75” by 1.25”
-    Puzzle style: Ribbon cut
-    Puzzle finish: High quality gloss on textured card stock
-    Packaging: High quality paper sleeve and reusable box
-    Shipping material: Off-white polymailer
-    
-    —
-    
-    We are Concord Puzzle, a small puzzle maker located in Concord, Massachusetts. We’re known for our dedication to crafting high-quality and engaging puzzles, with a focus on wholesome entertainment. Our unique packaging style reflects our homemade touch, and we prioritize customer interaction and feedback to continually improve our products. With a commitment to creating memorable experiences, we aim to provide joy and satisfaction to puzzle enthusiasts of all ages.
-    
-    <a href=\"http://rb.gy/reo16m\"><img class=\"wp-image-824 alignleft\" src=\"http://concordpuzzle.com/wp-content/uploads/2024/03/cropped-Concord-Puzzle-91-300x300.png\" alt=\"\" width=\"45\" height=\"45\" /></a>
-    
-    <a class=\"button product_type_simple add_to_cart_button\" href=\"http://rb.gy/reo16m\" rel=\"nofollow\" data-quantity=\"1\" aria-label=\"Add to cart: “Jaguar 500 Piece Puzzle”\" aria-describedby=\"\">Browse hundreds of puzzles</a>
-    
-    For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuzzle.com\">here</a>.";
-    
-            $woocommerce = new \Automattic\WooCommerce\Client(
-                env('WOOCOMMERCE_STORE_URL'),
-                env('WOOCOMMERCE_CONSUMER_KEY'),
-                env('WOOCOMMERCE_CONSUMER_SECRET'),
+    try {
+        // Call OpenAI API to generate a title and short description
+        $openaiApiKey = env('OPENAI_API_KEY');
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $openaiApiKey,
+            'Content-Type' => 'application/json'
+        ])->post('https://api.openai.com/v1/chat/completions', [
+            'model' => 'gpt-3.5-turbo',
+            'messages' => [
                 [
-                    'version' => 'wc/v3',
+                    'role' => 'system',
+                    'content' => 'You are a creative assistant who generates straightforward titles and descriptions for products, without useless adjectives.'
+                ],
+                [
+                    'role' => 'user',
+                    'content' => "Create a unique title and short description for a jigsaw puzzle based on this prompt: '$prompt'. The title should end with '500 Piece Puzzle'. The short description should explain the image based on the prompt, acknowledge that the puzzle was made by {$userName} and that it was made on the Make a Puzzle platform. The short description should be very clear and concise, explaining exactly what the image is. No marketing language. Title should be succinct and descriptive."
                 ]
-            );
-    
-            $relativeUrl = Storage::url($image->generated_image);
-            $publicUrl = url($relativeUrl);
-    
-            // URLs of the additional images already uploaded in WordPress
-            $additionalImage1 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Concord-Puzzle-2024-06-07T114127.702-768x534.png';
-            $additionalImage2 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Tight-fit.-2024-04-30T135654.378-416x256.png';
-            $addOverlayImage = 'http://concordpuzzle.com/wp-content/uploads/2024/06/Add-a-heading.png';
+            ],
+            'max_tokens' => 100,
+            'n' => 1,
+            'stop' => ['\n']
+        ]);
+
+        if ($response->failed()) {
+            throw new \Exception('Failed to get a successful response from OpenAI API: ' . $response->body());
+        }
+
+        $openaiResult = $response->json();
+        $generatedText = $openaiResult['choices'][0]['message']['content'];
+
+        // Extract title and short description
+        $generatedLines = explode("\n", trim($generatedText));
+        $title = str_replace('Title:', '', $generatedLines[0]);
+        $title = str_replace('"', '', $title);
+        $shortDescription = str_replace('Description:', '', implode(' ', array_slice($generatedLines, 1)));
+
+        // Detailed Description
+        $description = "Completed puzzle dimensions: 20.5” by 15”
+Individual pieces dimensions: 0.75” by 1.25”
+Puzzle style: Ribbon cut
+Puzzle finish: High quality gloss on textured card stock
+Packaging: High quality paper sleeve and reusable box
+Shipping material: Off-white polymailer
+
+—
+
+We are Concord Puzzle, a small puzzle maker located in Concord, Massachusetts. We’re known for our dedication to crafting high-quality and engaging puzzles, with a focus on wholesome entertainment. Our unique packaging style reflects our homemade touch, and we prioritize customer interaction and feedback to continually improve our products. With a commitment to creating memorable experiences, we aim to provide joy and satisfaction to puzzle enthusiasts of all ages.
+
+<a href=\"http://rb.gy/reo16m\"><img class=\"wp-image-824 alignleft\" src=\"http://concordpuzzle.com/wp-content/uploads/2024/03/cropped-Concord-Puzzle-91-300x300.png\" alt=\"\" width=\"45\" height=\"45\" /></a>
+
+<a class=\"button product_type_simple add_to_cart_button\" href=\"http://rb.gy/reo16m\" rel=\"nofollow\" data-quantity=\"1\" aria-label=\"Add to cart: “Jaguar 500 Piece Puzzle”\" aria-describedby=\"\">Browse hundreds of puzzles</a>
+
+For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuzzle.com\">here</a>.";
+
+        $woocommerce = new \Automattic\WooCommerce\Client(
+            env('WOOCOMMERCE_STORE_URL'),
+            env('WOOCOMMERCE_CONSUMER_KEY'),
+            env('WOOCOMMERCE_CONSUMER_SECRET'),
+            [
+                'version' => 'wc/v3',
+            ]
+        );
+
+        $relativeUrl = Storage::url($image->generated_image);
+        $publicUrl = url($relativeUrl);
+
+        // URL of the additional image to overlay
+        $overlayImageUrl = 'http://concordpuzzle.com/wp-content/uploads/2024/06/Concord-Puzzle-15.png';
+
         // Log the paths
         Log::info('Main Image Path: ' . Storage::path('public/' . $image->generated_image));
-        Log::info('Additional Image 1 URL: ' . $additionalImage1);
+        Log::info('Overlay Image URL: ' . $overlayImageUrl);
 
-        // Overlay additional image on the main image
+        // Crop the original image to 1.436:1 ratio and overlay the additional image
         try {
             $mainImagePath = Storage::path('public/' . $image->generated_image);
             if (!file_exists($mainImagePath)) {
@@ -391,10 +388,20 @@ public function showCropped($id)
             }
 
             $mainImage = Image::make($mainImagePath);
+            
+            // Crop to 1.436:1 ratio
+            $cropWidth = $mainImage->width();
+            $cropHeight = round($cropWidth / 1.436);
+            if ($cropHeight > $mainImage->height()) {
+                $cropHeight = $mainImage->height();
+                $cropWidth = round($cropHeight * 1.436);
+            }
+            $mainImage->crop($cropWidth, $cropHeight);
 
-            $overlayImageContents = @file_get_contents($addOverlayImage);
+            // Load the overlay image
+            $overlayImageContents = @file_get_contents($overlayImageUrl);
             if ($overlayImageContents === false) {
-                throw new \Exception('Additional image 1 URL is not accessible: ' . $additionalImage1);
+                throw new \Exception('Overlay image URL is not accessible: ' . $overlayImageUrl);
             }
 
             $overlayImage = Image::make($overlayImageContents)->resize($mainImage->width(), $mainImage->height());
@@ -423,8 +430,6 @@ public function showCropped($id)
             'description' => $description,
             'images' => [
                 ['src' => url($overlayedPublicUrl)],
-                ['src' => $additionalImage1],
-                ['src' => $additionalImage2]
             ],
             'type' => 'simple',
             'regular_price' => '14.93',
@@ -466,7 +471,6 @@ public function showCropped($id)
     }
 }
 
-    
         // Other methods..
 public function puzzleFeed()
 {
