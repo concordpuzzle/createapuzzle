@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+<?php use Illuminate\Support\Facades\Storage; ?>
+
 @section('content')
 <div class="container text-center">
     <h1 class="page-title">Your New 500 Piece Puzzle!</h1>
