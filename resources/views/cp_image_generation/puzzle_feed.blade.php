@@ -25,7 +25,7 @@
     }
     .like-count {
         font-style: italic;
-        font-size: 9px;
+        font-size: 11px;
     }
     .card-body {
         display: flex;
@@ -50,7 +50,7 @@
                     </a>
                     <div class="card-footer">
                         <div class="like-count">
-                            <span id="like-count-{{ $product->id }}">{{ $product->likes->count() }}</span> people like this &middot; Click picture for more
+                            <span id="like-count-{{ $product->id }}">{{ $product->likes->count() }}</span> likes &middot; Click image for more
                         </div>
                         <button class="like-button {{ $product->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" onclick="toggleLike({{ $product->id }}, this)">
                             <i class="fa fa-heart{{ $product->likes->contains('user_id', auth()->id()) ? '' : '-o' }}"></i>
