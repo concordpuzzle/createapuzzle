@@ -302,7 +302,6 @@ public function showCropped($id)
 }
 
     // Your existing methods...
-
     public function createProduct(Request $request)
     {
         $image = CPImageGeneration::findOrFail($request->input('image_id'));
@@ -379,87 +378,95 @@ public function showCropped($id)
             // URLs of the additional images already uploaded in WordPress
             $additionalImage1 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Concord-Puzzle-2024-06-07T114127.702-768x534.png';
             $additionalImage2 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Tight-fit.-2024-04-30T135654.378-416x256.png';
-    
-            // Log the paths
-            Log::info('Main Image Path: ' . Storage::path('public/' . $image->generated_image));
-            Log::info('Additional Image 1 URL: ' . $additionalImage1);
-    
-            // Overlay additional image on the main image
-            try {
-                $mainImagePath = Storage::path('public/' . $image->generated_image);
-                if (!file_exists($mainImagePath)) {
-                    throw new \Exception('Main image file does not exist at path: ' . $mainImagePath);
-                }
-    
-                $mainImage = Image::make($mainImagePath);
-    
-                $overlayImageContents = @file_get_contents($additionalImage1);
-                if ($overlayImageContents === false) {
-                    throw new \Exception('Additional image 1 URL is not accessible: ' . $additionalImage1);
-                }
-    
-                $overlayImage = Image::make($overlayImageContents)->resize($mainImage->width(), $mainImage->height());
-                $mainImage->insert($overlayImage, 'center');
-                $overlayedImageName = 'generated_images/overlayed_' . uniqid() . '.png';
-                $mainImage->save(Storage::path('public/' . $overlayedImageName));
-            } catch (\Exception $e) {
-                Log::error('Error generating overlayed image', [
-                    'message' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ]);
+
+        // Log the paths
+        Log::info('Main Image Path: ' . Storage::path('public/' . $image->generated_image));
+        Log::info('Additional Image 1 URL: ' . $additionalImage1);
+
+        // Overlay additional image on the main image
+        try {
+            $mainImagePath = Storage::path('public/' . $image->generated_image);
+            if (!file_exists($mainImagePath)) {
+                throw new \Exception('Main image file does not exist at path: ' . $mainImagePath);
             }
-    
-            // Add the product to the WooCommerce store
-            $data = [
-                'name' => $title,
-                'short_description' => $shortDescription,
-                'description' => $description,
-                'images' => [
-                    ['src' => $publicUrl],
-                    ['src' => $additionalImage1],
-                    ['src' => $additionalImage2]
-                ],
-                'type' => 'simple',
-                'regular_price' => '14.93',
-                'categories' => [
-                    ['id' => 1712], // Replace with the ID of the "Community Made" category
-                    ['id' => 17]  // Replace with the ID of the "500 Piece Puzzle" category
-                ],
-            ];
-    
-            $product = $woocommerce->post('products', $data);
-    
-            // Save the product information to the database
-            PublishedProduct::create([
-                'image_id' => $image->id,
-                'user_id' => $user->id,
-                'title' => $title,
-                'description' => $description,
-                'product_id' => $product->id,
-                'product_url' => $product->permalink,
-                'cropped_image' => $image->generated_image, // Assuming the cropped image is stored here
-            ]);
-    
-            // Get the product URL
-            $productUrl = $product->permalink;
-            return redirect($productUrl);
-    
-        } catch (HttpClientException $e) {
-            $error = $e->getMessage();
-            Log::error("Error creating product: cURL Error: $error");
-            return back()->with('error', $error);
+
+            $mainImage = Image::make($mainImagePath);
+
+            $overlayImageContents = @file_get_contents($additionalImage1);
+            if ($overlayImageContents === false) {
+                throw new \Exception('Additional image 1 URL is not accessible: ' . $additionalImage1);
+            }
+
+            $overlayImage = Image::make($overlayImageContents)->resize($mainImage->width(), $mainImage->height());
+            $mainImage->insert($overlayImage, 'center');
+            $overlayedImageName = 'generated_images/overlayed_' . uniqid() . '.png';
+            $overlayedImagePath = Storage::path('public/' . $overlayedImageName);
+            $mainImage->save($overlayedImagePath);
+
+            // Generate public URL for the overlayed image
+            $overlayedPublicUrl = Storage::url($overlayedImageName);
+
         } catch (\Exception $e) {
-            Log::error('Error generating title and description', [
+            Log::error('Error generating overlayed image', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
-            return back()->with('error', 'Failed to generate title and description.');
+            return back()->with('error', 'Failed to generate overlayed image.');
         }
+
+        // Add the product to the WooCommerce store
+        $data = [
+            'name' => $title,
+            'short_description' => $shortDescription,
+            'description' => $description,
+            'images' => [
+                ['src' => url($overlayedPublicUrl)],
+                ['src' => $additionalImage1],
+                ['src' => $additionalImage2]
+            ],
+            'type' => 'simple',
+            'regular_price' => '14.93',
+            'categories' => [
+                ['id' => 1712], // Replace with the ID of the "Community Made" category
+                ['id' => 17]  // Replace with the ID of the "500 Piece Puzzle" category
+            ],
+        ];
+
+        $product = $woocommerce->post('products', $data);
+
+        // Save the product information to the database
+        PublishedProduct::create([
+            'image_id' => $image->id,
+            'user_id' => $user->id,
+            'title' => $title,
+            'description' => $description,
+            'product_id' => $product->id,
+            'product_url' => $product->permalink,
+            'cropped_image' => $overlayedImageName, // Save the overlayed image name
+        ]);
+
+        // Get the product URL
+        $productUrl = $product->permalink;
+        return redirect($productUrl);
+
+    } catch (HttpClientException $e) {
+        $error = $e->getMessage();
+        Log::error("Error creating product: cURL Error: $error");
+        return back()->with('error', $error);
+    } catch (\Exception $e) {
+        Log::error('Error generating title and description', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ]);
+        return back()->with('error', 'Failed to generate title and description.');
     }
+}
+
+    
         // Other methods..
 public function puzzleFeed()
 {
