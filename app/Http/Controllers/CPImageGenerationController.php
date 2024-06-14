@@ -436,7 +436,7 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
             'description' => $description,
             'images' => [
                 ['src' => url($overlayedPublicUrl)],
-                ['src' => url(Storage::url($croppedImageName))],
+                ['src' => $publicUrl],
                 ['src' => $additionalImage1],
                 ['src' => $additionalImage2],
             ],
