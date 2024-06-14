@@ -373,8 +373,10 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
         $relativeUrl = Storage::url($image->generated_image);
         $publicUrl = url($relativeUrl);
 
-        // URL of the additional image to overlay
+        // URL of the additional images to overlay
         $overlayImageUrl = 'http://concordpuzzle.com/wp-content/uploads/2024/06/Concord-Puzzle-15.png';
+        $additionalImage1 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Concord-Puzzle-2024-06-07T114127.702-768x534.png';
+        $additionalImage2 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Tight-fit.-2024-04-30T135654.378-416x256.png';
 
         // Log the paths
         Log::info('Main Image Path: ' . Storage::path('public/' . $image->generated_image));
@@ -397,6 +399,10 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
                 $cropWidth = round($cropHeight * 1.436);
             }
             $mainImage->crop($cropWidth, $cropHeight);
+
+            // Save the cropped image locally
+            $croppedImageName = 'generated_images/cropped_' . uniqid() . '.png';
+            $mainImage->save(Storage::path('public/' . $croppedImageName));
 
             // Load the overlay image
             $overlayImageContents = @file_get_contents($overlayImageUrl);
@@ -430,6 +436,9 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
             'description' => $description,
             'images' => [
                 ['src' => url($overlayedPublicUrl)],
+                ['src' => url(Storage::url($croppedImageName))],
+                ['src' => $additionalImage1],
+                ['src' => $additionalImage2],
             ],
             'type' => 'simple',
             'regular_price' => '14.93',
@@ -449,7 +458,7 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
             'description' => $description,
             'product_id' => $product->id,
             'product_url' => $product->permalink,
-            'cropped_image' => $overlayedImageName, // Save the overlayed image name
+            'cropped_image' => $croppedImageName, // Save the cropped image name
         ]);
 
         // Get the product URL
