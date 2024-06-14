@@ -33,7 +33,7 @@
 }
 
 </style>
-        <title>{{ config('app.name', 'Concord Puzzle') }}</title>
+        <title>Make a Puzzle - Puzzle Feed</title>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ETLGDQVH5T"></script>
 <script>
