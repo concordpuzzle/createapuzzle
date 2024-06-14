@@ -305,6 +305,7 @@ public function showCropped($id)
 
     public function createProduct(Request $request)
     {
+        
         $image = CPImageGeneration::findOrFail($request->input('image_id'));
         $user = auth()->user();
         $prompt = $image->prompt;
