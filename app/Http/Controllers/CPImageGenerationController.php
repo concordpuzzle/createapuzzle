@@ -378,7 +378,7 @@ public function showCropped($id)
             // URLs of the additional images already uploaded in WordPress
             $additionalImage1 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Concord-Puzzle-2024-06-07T114127.702-768x534.png';
             $additionalImage2 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Tight-fit.-2024-04-30T135654.378-416x256.png';
-
+            $addOverlayImage = 'http://concordpuzzle.com/wp-content/uploads/2024/06/Add-a-heading.png';
         // Log the paths
         Log::info('Main Image Path: ' . Storage::path('public/' . $image->generated_image));
         Log::info('Additional Image 1 URL: ' . $additionalImage1);
@@ -392,7 +392,7 @@ public function showCropped($id)
 
             $mainImage = Image::make($mainImagePath);
 
-            $overlayImageContents = @file_get_contents($additionalImage1);
+            $overlayImageContents = @file_get_contents($addOverlayImage);
             if ($overlayImageContents === false) {
                 throw new \Exception('Additional image 1 URL is not accessible: ' . $additionalImage1);
             }
