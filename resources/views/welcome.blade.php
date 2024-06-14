@@ -126,7 +126,7 @@
                             <div>
                                 <img src="https://concordpuzzle.com/wp-content/uploads/2024/06/Create-a-Puzzle-1.png" width="95px;"><br />
 
-                                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">By Concord Puzzle</h2>
+                                <h2 class="text-xl font-semibold text-gray-900">By Concord Puzzle</h2>
 
                                 <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
                                 We offer customizable jigsaw puzzles in various piece counts and styles, including 12-piece and 500-piece options. Based in Massachusetts, our focus is on customer satisfaction, aiming to be a one-stop shop for puzzle enthusiasts by allowing personalization of puzzle designs. You can shop with us on Etsy and Instagram, with flat rate shipping available.</p>
