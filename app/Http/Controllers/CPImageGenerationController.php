@@ -381,12 +381,12 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
         $additionalImage2 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Tight-fit.-2024-04-30T135654.378-416x256.png';
 
         // Log the paths
-        Log::info('Main Image Path: ' . Storage::path('public/' . $image->generated_image));
+        Log::info('Main Image Path: ' . Storage::path('public/storage/' . $image->generated_image));
         Log::info('Additional Image 1 URL: ' . $additionalImage1);
 
         // Overlay additional image on the main image
         try {
-            $mainImagePath = Storage::path('public/' . $image->generated_image);
+            $mainImagePath = Storage::path('public/storage/' . $image->generated_image);
             if (!file_exists($mainImagePath)) {
                 throw new \Exception('Main image file does not exist at path: ' . $mainImagePath);
             }
@@ -401,7 +401,7 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
             $overlayImage = Image::make($overlayImageContents)->resize($mainImage->width(), $mainImage->height());
             $mainImage->insert($overlayImage, 'center');
             $overlayedImageName = 'generated_images/overlayed_' . uniqid() . '.png';
-            $mainImage->save(Storage::path('public/' . $overlayedImageName));
+            $mainImage->save(Storage::path('public/storage/' . $overlayedImageName));
         } catch (\Exception $e) {
             Log::error('Error generating overlayed image', [
                 'message' => $e->getMessage(),
