@@ -374,7 +374,7 @@ For questions regarding our puzzles, email us <a href=\"mailto:jeremy@concordpuz
         $publicUrl = url($relativeUrl);
 
         // URL of the additional images to overlay
-        $overlayImageUrl = 'http://concordpuzzle.com/wp-content/uploads/2024/06/Concord-Puzzle-15.png';
+        $overlayImageUrl = 'http://concordpuzzle.com/wp-content/uploads/2024/06/Concord-Puzzle-16.png';
         $additionalImage1 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Concord-Puzzle-2024-06-07T114127.702-768x534.png';
         $additionalImage2 = 'https://concordpuzzle.com/wp-content/uploads/2024/04/Tight-fit.-2024-04-30T135654.378-416x256.png';
 
