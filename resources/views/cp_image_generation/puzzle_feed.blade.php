@@ -25,32 +25,52 @@
     }
     .like-count {
         font-style: italic;
-        font-size: 11px;
+        font-size: 14px;
+        margin-right: 10px;
+    }
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
     }
     .card-body {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
     }
-    .card-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    .card-img-top {
+        transition: transform 0.2s ease;
+    }
+    .card:hover .card-img-top {
+        transform: scale(1.05);
+    }
+    .card-title {
+        font-size: 18px;
+        font-weight: bold;
+    }
+    .card-description {
+        font-size: 14px;
+        color: #6c757d;
     }
 </style>
 
 <div class="container text-center my-5">
-    <h1 style="font-size:22px!important;" class="display-4 mb-4 radio-canada-big">Community Made Puzzles</h1>
+    <h1 class="display-4 mb-4 radio-canada-big" style="font-size:22px!important;">Community Made Puzzles</h1>
     <div class="row">
         @foreach($publishedProducts as $product)
             <div class="col-md-3 mb-4">
                 <div class="card h-100 shadow-sm">
-                    <a href="{{ $product->product_url }}">
+                    <a href="{{ $product->product_url }}" class="text-decoration-none">
                         <img src="{{ Storage::url($product->cropped_image) }}" class="card-img-top" alt="{{ $product->title }}" style="border-radius: 4px;">
+                        <div class="card-body">
+                            <h5 class="card-title text-dark">{{ $product->title }}</h5>
+                            <p class="card-description">{{ Str::limit($product->description, 80) }}</p>
+                        </div>
                     </a>
                     <div class="card-footer">
                         <div class="like-count">
-                            <span id="like-count-{{ $product->id }}">{{ $product->likes->count() }}</span> likes &middot; Click image for more
+                            <span id="like-count-{{ $product->id }}">{{ $product->likes->count() }}</span> likes
                         </div>
                         <button class="like-button {{ $product->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" onclick="toggleLike({{ $product->id }}, this)">
                             <i class="fa fa-heart{{ $product->likes->contains('user_id', auth()->id()) ? '' : '-o' }}"></i>
