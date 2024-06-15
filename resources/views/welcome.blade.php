@@ -130,7 +130,19 @@
                     </div>
                 </div>
 
-                
+                <!-- Community Puzzles Section -->
+<div class="max-w-7xl mx-auto mt-16 px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        @foreach($publishedProducts as $product)
+            <div class="bg-white rounded-lg shadow p-4">
+                <a href="{{ $product->product_url }}">
+                    <img src="{{ Storage::url($product->cropped_image) }}" alt="{{ $product->title }}" class="w-full h-auto rounded">
+                </a>
+                <h3 class="mt-4 text-lg font-semibold text-gray-900">{{ $product->title }}</h3>
+            </div>
+        @endforeach
+    </div>
+</div>
                 <div class="flex justify-center mt-16 px-0 sm:items-center">
                     <div class="text-center text-sm sm:text-left">
                        <center> &copy; Concord Puzzle<br>A Massachusetts Puzzle Company e.2023 </center>
