@@ -143,7 +143,7 @@
                                 We offer customizable jigsaw puzzles in various piece counts and styles, including 12-piece and 500-piece options. Based in Massachusetts, our focus is on customer satisfaction, aiming to be a one-stop shop for puzzle enthusiasts by allowing personalization of puzzle designs. You can shop with us on Etsy and Instagram, with flat rate shipping available.</p>
                             </div>
                         </div>
-                        <h2>Popular Community Made Puzzle</h2><br>
+                       <h2 style="font-size:22px;text-align:center;">Popular Community Made Puzzle</h2><br>
                         @foreach($publishedProducts->sortByDesc(function ($product) {
             return $product->likes->count();
         }) as $product)
