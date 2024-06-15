@@ -130,48 +130,7 @@
                     </div>
                 </div>
 
-
-<!-- Dependencies -->
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-
-<!-- Carousel -->
-<div class="container mt-5">
-    <div class="carousel-container">
-        <div class="carousel">
-            @foreach($publishedProducts as $product)
-                <a href="{{ $product->product_url }}">
-                    <img src="{{ Storage::url($product->cropped_image) }}" alt="{{ $product->title }}" width="250px">
-                </a>
-            @endforeach
-        </div>
-    </div>
-</div>
-
-<!-- Carousel Styles -->
-<style>
-    .carousel-container {
-        overflow: hidden;
-        position: relative;
-        margin-top: 50px;
-    }
-    .carousel {
-        display: flex;
-        animation: scroll 30s linear infinite;
-    }
-    .carousel img {
-        border-radius: 4px;
-        margin: 0 10px;
-    }
-    .carousel:hover {
-        animation-play-state: paused;
-    }
-    @keyframes scroll {
-        0% { transform: translateX(0); }
-        100% { transform: translateX(calc(-250px * 7)); }
-    }
-</style>
+                
                 <div class="flex justify-center mt-16 px-0 sm:items-center">
                     <div class="text-center text-sm sm:text-left">
                        <center> &copy; Concord Puzzle<br>A Massachusetts Puzzle Company e.2023 </center>
