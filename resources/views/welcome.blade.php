@@ -188,7 +188,6 @@
                 <a href="{{ $product->product_url }}" class="block mb-4">
                     <img src="{{ Storage::url($product->cropped_image) }}" alt="{{ $product->title }}" class="w-24 h-auto mb-4 rounded-lg" style="border-radius: 10px;">
                 </a>
-                <h2 class="text-xl font-semibold text-gray-900 text-center">{{ $product->title }}</h2>
                 <div class="mt-4 text-center">
                     <span class="text-gray-500 text-sm">{{ $product->likes->count() }} likes</span>
                     <button class="like-button ml-2 {{ $product->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" onclick="toggleLike({{ $product->id }}, this)">
