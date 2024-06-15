@@ -127,6 +127,19 @@
                                 We offer customizable jigsaw puzzles in various piece counts and styles, including 12-piece and 500-piece options. Based in Massachusetts, our focus is on customer satisfaction, aiming to be a one-stop shop for puzzle enthusiasts by allowing personalization of puzzle designs. You can shop with us on Etsy and Instagram, with flat rate shipping available.</p>
                             </div>
                         </div>
+                        @foreach($publishedProducts as $product)
+            <div class="scale-100 p-6 bg-white rounded-lg shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
+                <div>
+                    <a href="{{ $product->product_url }}">
+                        <img src="{{ Storage::url($product->cropped_image) }}" alt="{{ $product->title }}" class="w-24 h-auto mb-4 rounded">
+                    </a>
+                    <h2 class="text-xl font-semibold text-gray-900">{{ $product->title }}</h2>
+                    <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+                        {{ $product->description }}
+                    </p>
+                </div>
+            </div>
+        @endforeach
                     </div>
                 </div>
 
