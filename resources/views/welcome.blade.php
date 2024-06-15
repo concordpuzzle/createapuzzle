@@ -16,46 +16,6 @@
         </style>
 
 
-<script>
-    function toggleLike(productId, button) {
-        @guest
-            window.location.href = '{{ route("login") }}';
-            return;
-        @endguest
-
-        const isLiked = button.classList.contains('liked');
-        const url = isLiked ? '{{ route("cp_image_generation.unlike") }}' : '{{ route("cp_image_generation.like") }}';
-
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                product_id: productId
-            },
-            success: function(response) {
-                if (response.success) {
-                    const likeCountElement = button.previousElementSibling;
-                    likeCountElement.textContent = response.likes_count + ' likes';
-                    if (isLiked) {
-                        button.classList.remove('liked');
-                        button.querySelector('i').classList.remove('fa-heart');
-                        button.querySelector('i').classList.add('fa-heart-o');
-                    } else {
-                        button.classList.add('liked');
-                        button.querySelector('i').classList.remove('fa-heart-o');
-                        button.querySelector('i').classList.add('fa-heart');
-                    }
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(error) {
-                console.error('Error toggling like:', error);
-            }
-        });
-    }
-</script>
 
 <style>
     .like-button {
@@ -183,12 +143,13 @@
                                 We offer customizable jigsaw puzzles in various piece counts and styles, including 12-piece and 500-piece options. Based in Massachusetts, our focus is on customer satisfaction, aiming to be a one-stop shop for puzzle enthusiasts by allowing personalization of puzzle designs. You can shop with us on Etsy and Instagram, with flat rate shipping available.</p>
                             </div>
                         </div>
-                        @foreach($publishedProducts as $product)
+                        @foreach($publishedProducts->sortByDesc(function ($product) {
+            return $product->likes->count();
+        }) as $product)
             <div class="scale-100 p-6 bg-white rounded-lg shadow-none flex flex-col items-center motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                 <a href="{{ $product->product_url }}" class="block mb-4">
                     <img src="{{ Storage::url($product->cropped_image) }}" alt="{{ $product->title }}" class="w-24 h-auto mb-4 rounded-lg" style="border-radius: 10px;">
                 </a>
-                &nbsp;&nbsp;&nbsp;
                 <div class="mt-4 text-center">
                     <span class="text-gray-500 text-sm">{{ $product->likes->count() }} likes</span>
                     <button class="like-button ml-2 {{ $product->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" onclick="toggleLike({{ $product->id }}, this)">
@@ -208,4 +169,46 @@
             </div>
         </div>
     </body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    function toggleLike(productId, button) {
+        @guest
+            window.location.href = '{{ route("login") }}';
+            return;
+        @endguest
+
+        const isLiked = button.classList.contains('liked');
+        const url = isLiked ? '{{ route("cp_image_generation.unlike") }}' : '{{ route("cp_image_generation.like") }}';
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                product_id: productId
+            },
+            success: function(response) {
+                if (response.success) {
+                    const likeCountElement = button.previousElementSibling;
+                    likeCountElement.textContent = response.likes_count + ' likes';
+                    if (isLiked) {
+                        button.classList.remove('liked');
+                        button.querySelector('i').classList.remove('fa-heart');
+                        button.querySelector('i').classList.add('fa-heart-o');
+                    } else {
+                        button.classList.add('liked');
+                        button.querySelector('i').classList.remove('fa-heart-o');
+                        button.querySelector('i').classList.add('fa-heart');
+                    }
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(error) {
+                console.error('Error toggling like:', error);
+            }
+        });
+    }
+</script>
+
 </html>
