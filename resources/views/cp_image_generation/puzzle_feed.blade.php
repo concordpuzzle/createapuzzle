@@ -65,7 +65,6 @@
                         <img src="{{ Storage::url($product->cropped_image) }}" class="card-img-top" alt="{{ $product->title }}" style="border-radius: 4px;">
                         <div class="card-body">
                             <h5 class="card-title text-dark">{{ $product->title }}</h5>
-                            <p class="card-description">{{ Str::limit($product->description, 80) }}</p>
                         </div>
                     </a>
                     <div class="card-footer">
