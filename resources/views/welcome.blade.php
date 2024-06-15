@@ -129,21 +129,7 @@
                         </div>
                     </div>
                 </div>
-                @foreach($publishedProducts as $product)
-            <a href="{{ $product->product_url }}" class="scale-100 p-6 bg-white rounded-lg shadow-none flex flex-col motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
-                <div class="flex flex-col items-center">
-                    <div class="h-16 w-16 flex items-center justify-center rounded-full" style="background-color:#0c2461;">
-                        <i class="fa-solid fa-puzzle-piece" style="color:#fff;font-size:22px;"></i>
-                    </div>
-                    <h2 class="mt-6 text-xl font-semibold text-gray-900">{{ $product->title }}</h2>
-                    <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{{ $product->description }}</p>
-                </div>
-                <img src="{{ Storage::url($product->cropped_image) }}" alt="{{ $product->title }}" class="w-full h-auto mt-4 rounded">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="self-center shrink-0 stroke-black-500 w-6 h-6 mx-6 mt-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
-                </svg>
-            </a>
-        @endforeach
+
                 
                 <div class="flex justify-center mt-16 px-0 sm:items-center">
                     <div class="text-center text-sm sm:text-left">
