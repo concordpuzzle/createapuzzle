@@ -24,17 +24,8 @@
         color: #f5f6fa;
     }
     .prompt-input {
-        font-size: 33px;
+        font-size: 20px;
         text-align: center;
-    }
-    .append-button {
-        font-size: 14px;
-        background-color: #0c2461;
-        color: white;
-        margin-right: 5px;
-    }
-    .append-button:hover {
-        color: #f5f6fa;
     }
     .create-button {
         font-size: 22px;
@@ -135,31 +126,33 @@
             @endif
         @endforeach
     </div>
+</div>
 
-    <!-- Canvas to hold cropped image data -->
-    <canvas id="croppedCanvas" style="display:none;"></canvas>
+<!-- Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-labelledby="loadingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="spinner" style="width: 3rem; height: 3rem; margin-bottom: 1rem;"></div>
+                <h5 id="loadingModalText">Processing your request...</h5>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <script>
-    let imageId;
-    let messageId;
-
-    function appendText(text) {
-        const promptInput = document.getElementById('prompt');
-        promptInput.value += ` ${text}`;
-    }
-
     document.getElementById('imageGenerationForm').addEventListener('submit', function () {
-        document.getElementById('createButtonText').style.display = 'none';
-        document.getElementById('mainSpinner').style.display = 'inline-block';
+        $('#loadingModal').modal('show');
     });
 
     function upscaleImage(buttonElement, imageId, messageId, button) {
         const spinner = buttonElement.querySelector('.spinner');
         spinner.style.display = 'inline-block';
+
+        $('#loadingModal').modal('show');
+        document.getElementById('loadingModalText').textContent = 'Upscaling your image...';
 
         fetch('{{ route('cp_image_generation.upscale') }}', {
             method: 'POST',
@@ -175,6 +168,7 @@
         .then(response => response.json())
         .then(data => {
             spinner.style.display = 'none';
+            $('#loadingModal').modal('hide');
             if (data.success) {
                 location.href = '{{ url('cp-image-generation/upscaled') }}/' + data.id;
             } else {
@@ -183,6 +177,7 @@
         })
         .catch(error => {
             spinner.style.display = 'none';
+            $('#loadingModal').modal('hide');
             console.error('Error:', error);
             alert('Upscaling failed: ' + error.message);
         });
