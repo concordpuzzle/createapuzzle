@@ -129,20 +129,21 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Community Puzzles Section -->
-<div class="max-w-7xl mx-auto mt-16 px-6 lg:px-8">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        @foreach($publishedProducts as $product)
-            <div class="bg-white rounded-lg shadow p-4">
-                <a href="{{ $product->product_url }}">
-                    <img src="{{ Storage::url($product->cropped_image) }}" alt="{{ $product->title }}" class="w-full h-auto rounded">
-                </a>
-                <h3 class="mt-4 text-lg font-semibold text-gray-900">{{ $product->title }}</h3>
-            </div>
+                @foreach($publishedProducts as $product)
+            <a href="{{ $product->product_url }}" class="scale-100 p-6 bg-white rounded-lg shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
+                <div>
+                    <div class="h-16 w-16 flex items-center justify-center rounded-full" style="background-color:#0c2461;">
+                        <i class="fa-solid fa-puzzle-piece" style="color:#fff;font-size:22px;"></i>
+                    </div>
+                    <h2 class="mt-6 text-xl font-semibold text-gray-900">{{ $product->title }}</h2>
+                    <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{{ $product->description }}</p>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="self-center shrink-0 stroke-black-500 w-6 h-6 mx-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                </svg>
+            </a>
         @endforeach
-    </div>
-</div>
+                
                 <div class="flex justify-center mt-16 px-0 sm:items-center">
                     <div class="text-center text-sm sm:text-left">
                        <center> &copy; Concord Puzzle<br>A Massachusetts Puzzle Company e.2023 </center>
