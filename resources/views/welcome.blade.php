@@ -129,7 +129,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="flex justify-center mt-16 px-0 sm:items-center">
                     <div class="text-center text-sm sm:text-left">
                        <center> &copy; Concord Puzzle<br>A Massachusetts Puzzle Company e.2023 </center>
