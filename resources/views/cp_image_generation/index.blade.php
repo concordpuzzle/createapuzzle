@@ -82,50 +82,54 @@
     </form>
     <br>
     <h2 class="radio-canada-big mb-5" style="font-size: 28px;">Picture Options</h2>
-    <div class="row justify-content-center">
-        @foreach($images as $image)
-            @if($image->image_type == 'original')
-            <div class="col-md-4 d-flex justify-content-center mb-4">
-                <div class="card shadow-sm">
-                    <img src="{{ Storage::url($image->generated_image) }}" class="card-img-top" alt="{{ $image->prompt }}" style="border-radius: 4px;">
-                    <div class="card-body text-center">
-                        <p class="card-text radio-canada-big">{{ $image->prompt }}</p>
-                        <div class="mt-3">
-                            <div class="row mb-2">
-                                <div class="col">
-                                    <button class="btn upscale-button radio-canada-big w-100" onclick="upscaleImage(this, '{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U1')">
-                                        <div class="spinner" id="U1Spinner"></div>
-                                        Top Left
-                                    </button>
+    @if($images->isEmpty())
+        <p class="text-muted radio-canada-big">No images generated yet. Start by entering a prompt and creating your first custom puzzle picture.</p>
+    @else
+        <div class="row justify-content-center">
+            @foreach($images as $image)
+                @if($image->image_type == 'original')
+                <div class="col-md-4 d-flex justify-content-center mb-4">
+                    <div class="card shadow-sm">
+                        <img src="{{ Storage::url($image->generated_image) }}" class="card-img-top" alt="{{ $image->prompt }}" style="border-radius: 4px;">
+                        <div class="card-body text-center">
+                            <p class="card-text radio-canada-big">{{ $image->prompt }}</p>
+                            <div class="mt-3">
+                                <div class="row mb-2">
+                                    <div class="col">
+                                        <button class="btn upscale-button radio-canada-big w-100" onclick="upscaleImage(this, '{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U1')">
+                                            <div class="spinner" id="U1Spinner"></div>
+                                            Top Left
+                                        </button>
+                                    </div>
+                                    <div class="col">
+                                        <button class="btn upscale-button radio-canada-big w-100" onclick="upscaleImage(this, '{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U2')">
+                                            <div class="spinner" id="U2Spinner"></div>
+                                            Top Right
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="col">
-                                    <button class="btn upscale-button radio-canada-big w-100" onclick="upscaleImage(this, '{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U2')">
-                                        <div class="spinner" id="U2Spinner"></div>
-                                        Top Right
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col">
-                                    <button class="btn upscale-button radio-canada-big w-100" onclick="upscaleImage(this, '{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U3')">
-                                        <div class="spinner" id="U3Spinner"></div>
-                                        Bottom Left
-                                    </button>
-                                </div>
-                                <div class="col">
-                                    <button class="btn upscale-button radio-canada-big w-100" onclick="upscaleImage(this, '{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U4')">
-                                        <div class="spinner" id="U4Spinner"></div>
-                                        Bottom Right
-                                    </button>
+                                <div class="row">
+                                    <div class="col">
+                                        <button class="btn upscale-button radio-canada-big w-100" onclick="upscaleImage(this, '{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U3')">
+                                            <div class="spinner" id="U3Spinner"></div>
+                                            Bottom Left
+                                        </button>
+                                    </div>
+                                    <div class="col">
+                                        <button class="btn upscale-button radio-canada-big w-100" onclick="upscaleImage(this, '{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U4')">
+                                            <div class="spinner" id="U4Spinner"></div>
+                                            Bottom Right
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            @endif
-        @endforeach
-    </div>
+                @endif
+            @endforeach
+        </div>
+    @endif
 </div>
 
 <!-- Modal -->
