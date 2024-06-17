@@ -52,6 +52,7 @@
         margin-top: -0.5rem;
         margin-left: -0.5rem;
     }
+
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
@@ -152,9 +153,7 @@
                 </div>
                 <div class="mt-4">
                     <div class="row">
-                        @foreach($publishedProducts->sortByDesc(function ($product) {
-                            return $product->likes->count();
-                        }) as $product)
+                        @foreach($publishedProducts as $product)
                             <div class="col-md-4 mb-4">
                                 <div class="card shadow-sm h-100">
                                     <a href="{{ $product->product_url }}" class="block mb-4">
@@ -219,45 +218,6 @@
             $('#loadingModal').modal('hide');
             console.error('Error:', error);
             alert('Upscaling failed: ' + error.message);
-        });
-    }
-
-    function toggleLike(productId, button) {
-        @guest
-            window.location.href = '{{ route("login") }}';
-            return;
-        @endguest
-
-        const isLiked = button.classList.contains('liked');
-        const url = isLiked ? '{{ route("cp_image_generation.unlike") }}' : '{{ route("cp_image_generation.like") }}';
-
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                product_id: productId
-            },
-            success: function(response) {
-                if (response.success) {
-                    const likeCountElement = button.previousElementSibling;
-                    likeCountElement.textContent = response.likes_count + ' likes';
-                    if (isLiked) {
-                        button.classList.remove('liked');
-                        button.querySelector('i').classList.remove('fa-heart');
-                        button.querySelector('i').classList.add('fa-heart-o');
-                    } else {
-                        button.classList.add('liked');
-                        button.querySelector('i').classList.remove('fa-heart-o');
-                        button.querySelector('i').classList.add('fa-heart');
-                    }
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(error) {
-                console.error('Error toggling like:', error);
-            }
         });
     }
 </script>
