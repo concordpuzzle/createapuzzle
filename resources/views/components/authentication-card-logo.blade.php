@@ -27,7 +27,7 @@
   font-style: italic;
 }
 mark {
-  background-color: #079992;
+  background-color: #e58e26;
   color: #fff;
 }
 </style>
