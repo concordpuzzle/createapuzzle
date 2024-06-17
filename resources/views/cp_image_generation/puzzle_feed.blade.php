@@ -56,15 +56,13 @@
     }
     .overlay {
         position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
+        bottom: 20px;
+        left: 10px;
+        right: 10px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px;
         pointer-events: none;
-        background-color: rgba(0, 0, 0, 0.5); /* This ensures the text is visible on any image */
     }
     .overlay-content {
         pointer-events: all;
@@ -80,7 +78,7 @@
                     <a href="{{ $product->product_url }}" class="text-decoration-none">
                         <img src="{{ Storage::url($product->cropped_image) }}" class="card-img-top" alt="{{ $product->title }}" style="border-radius: 4px;">
                     </a>
-                    <div class="overlay">
+                    <div class="overlay" style="bottom: -20px;">
                         <div class="like-count" style="pointer-events: all;">
                             <span id="like-count-{{ $product->id }}">{{ $product->likes->count() }}</span> likes
                         </div>
