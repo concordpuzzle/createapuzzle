@@ -9,7 +9,7 @@
     <div class="card mb-4 shadow-sm mx-auto" style="max-width: 600px;">
         <img src="{{ Storage::url($image->generated_image) }}" class="card-img-top rounded-image" alt="Cropped Image">
         <div class="card-body">
-            <form id="publishPuzzleForm" method="POST" action="{{ route('cp_image_generation.create_product') }}" target="_blank">
+            <form method="POST" action="{{ route('cp_image_generation.create_product') }}">
                 @csrf
                 <input type="hidden" name="image_id" value="{{ $image->id }}">
                 <button type="submit" class="btn create-puzzle-btn">Publish Puzzle</button>
@@ -44,20 +44,4 @@
         border-radius: 4px;
     }
 </style>
-
-<script>
-    document.getElementById('publishPuzzleForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the default form submission
-
-        // Open the form action in a new tab
-        var form = event.target;
-        var newTab = window.open(form.action, '_blank');
-        newTab.focus();
-
-        // Set a timer for 10 seconds before refreshing the current tab
-        setTimeout(function() {
-            window.location.href = '{{ route('dashboard') }}';
-        }, 10000);
-    });
-</script>
 @endsection
