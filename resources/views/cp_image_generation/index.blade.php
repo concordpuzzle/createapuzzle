@@ -4,7 +4,7 @@
 <!-- Include Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Radio+Canada+Big:wght@400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Radio+Canada+Big:wght@400&family=Arvo:wght@700&display=swap" rel="stylesheet">
 
 <!-- Include Bootstrap CSS -->
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -13,6 +13,11 @@
     .radio-canada-big {
         font-family: "Radio Canada Big", sans-serif;
         font-weight: 400;
+    }
+    .arvo-bold {
+        font-family: "Arvo", serif;
+        font-weight: 700;
+        color: #b71540;
     }
     .upscale-button {
         font-size: 12px;
@@ -141,15 +146,14 @@
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 id="loadingModalLabel" class="modal-title">Community Made Puzzles</h5>
+                <h5 id="loadingModalLabel" class="arvo-bold">Community Made Puzzles</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="text-center">
-                    <div class="spinner" style="width: 3rem; height: 3rem; margin-bottom: 1rem;"></div>
-                    <h5 id="loadingModalText">Processing your request...</h5>
+                    <h5 id="loadingModalText" class="arvo-bold">Creating Puzzle Pictures.</h5>
                 </div>
                 <div class="mt-4">
                     <div class="row">
@@ -160,13 +164,13 @@
                                         <img src="{{ Storage::url($product->cropped_image) }}" alt="{{ $product->title }}" class="w-full h-auto rounded-lg" style="border-radius: 10px;">
                                     </a>
                                     <div class="card-body text-center">
-                                        <h5 class="card-title">{{ $product->title }}</h5>
-                                        <div class="mt-2">
-                                            <span class="text-gray-500 text-sm">{{ $product->likes->count() }} likes</span>
-                                            <button class="like-button ml-2 {{ $product->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" onclick="toggleLike({{ $product->id }}, this)">
-                                                <i class="fa fa-heart{{ $product->likes->contains('user_id', auth()->id()) ? '' : '-o' }}"></i>
-                                            </button>
-                                        </div>
+                                        <a href="{{ $product->product_url }}" target="_blank" class="text-gray-500 text-sm">Open in a new tab <i class="fa fa-external-link"></i></a>
+                                    </div>
+                                    <div class="card-footer d-flex justify-content-between align-items-center">
+                                        <span class="text-gray-500 text-sm">{{ $product->likes->count() }} likes</span>
+                                        <button class="like-button ml-2 {{ $product->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" onclick="toggleLike({{ $product->id }}, this)">
+                                            <i class="fa fa-heart{{ $product->likes->contains('user_id', auth()->id()) ? '' : '-o' }}"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -177,12 +181,22 @@
         </div>
     </div>
 </div>
+<script src="https://kit.fontawesome.com/21428d3739.js" crossorigin="anonymous"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script>
+    let loadingText = document.getElementById('loadingModalText');
+    let dots = 1;
+
+    function changeLoadingText() {
+        loadingText.textContent = 'Creating Puzzle Pictures' + '.'.repeat(dots);
+        dots = (dots % 3) + 1;
+    }
+
     document.getElementById('imageGenerationForm').addEventListener('submit', function () {
         $('#loadingModal').modal('show');
+        setInterval(changeLoadingText, 500);
     });
 
     function upscaleImage(buttonElement, imageId, messageId, button) {
