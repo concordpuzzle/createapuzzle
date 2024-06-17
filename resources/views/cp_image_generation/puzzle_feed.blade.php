@@ -112,6 +112,7 @@
             </div>
         @endforeach
     </div>
+    <br>
     <a href="{{ url('/dashboard') }}" class="make-puzzle-button">Make a Puzzle</a>
 </div>
 
