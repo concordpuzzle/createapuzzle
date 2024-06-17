@@ -27,7 +27,7 @@
         font-style: italic;
         font-size: 14px;
         margin-right: 10px;
-        color: #fff;
+        color: #000;
     }
     .card-footer {
         display: flex;
@@ -39,6 +39,7 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        padding: 0; /* Remove padding to ensure card ends at the bottom of the image */
     }
     .card-img-top {
         transition: transform 0.2s ease;
@@ -87,8 +88,6 @@
                                 <i class="fa fa-heart{{ $product->likes->contains('user_id', auth()->id()) ? '' : '-o' }}"></i>
                             </button>
                         </div>
-                    </div>
-                    <div class="card-body">
                     </div>
                 </div>
             </div>
