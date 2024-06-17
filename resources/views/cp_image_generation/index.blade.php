@@ -52,10 +52,13 @@
         margin-top: -0.5rem;
         margin-left: -0.5rem;
     }
-
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
+    }
+    .modal-body {
+        max-height: 60vh;
+        overflow-y: auto;
     }
 </style>
 
@@ -134,11 +137,43 @@
 
 <!-- Modal -->
 <div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-labelledby="loadingModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
-            <div class="modal-body text-center">
-                <div class="spinner" style="width: 3rem; height: 3rem; margin-bottom: 1rem;"></div>
-                <h5 id="loadingModalText">Processing your request...</h5>
+            <div class="modal-header">
+                <h5 id="loadingModalLabel" class="modal-title">Community Made Puzzles</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <div class="spinner" style="width: 3rem; height: 3rem; margin-bottom: 1rem;"></div>
+                    <h5 id="loadingModalText">Processing your request...</h5>
+                </div>
+                <div class="mt-4">
+                    <div class="row">
+                        @foreach($publishedProducts->sortByDesc(function ($product) {
+                            return $product->likes->count();
+                        }) as $product)
+                            <div class="col-md-4 mb-4">
+                                <div class="card shadow-sm h-100">
+                                    <a href="{{ $product->product_url }}" class="block mb-4">
+                                        <img src="{{ Storage::url($product->cropped_image) }}" alt="{{ $product->title }}" class="w-full h-auto rounded-lg" style="border-radius: 10px;">
+                                    </a>
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">{{ $product->title }}</h5>
+                                        <div class="mt-2">
+                                            <span class="text-gray-500 text-sm">{{ $product->likes->count() }} likes</span>
+                                            <button class="like-button ml-2 {{ $product->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" onclick="toggleLike({{ $product->id }}, this)">
+                                                <i class="fa fa-heart{{ $product->likes->contains('user_id', auth()->id()) ? '' : '-o' }}"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -184,6 +219,45 @@
             $('#loadingModal').modal('hide');
             console.error('Error:', error);
             alert('Upscaling failed: ' + error.message);
+        });
+    }
+
+    function toggleLike(productId, button) {
+        @guest
+            window.location.href = '{{ route("login") }}';
+            return;
+        @endguest
+
+        const isLiked = button.classList.contains('liked');
+        const url = isLiked ? '{{ route("cp_image_generation.unlike") }}' : '{{ route("cp_image_generation.like") }}';
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                product_id: productId
+            },
+            success: function(response) {
+                if (response.success) {
+                    const likeCountElement = button.previousElementSibling;
+                    likeCountElement.textContent = response.likes_count + ' likes';
+                    if (isLiked) {
+                        button.classList.remove('liked');
+                        button.querySelector('i').classList.remove('fa-heart');
+                        button.querySelector('i').classList.add('fa-heart-o');
+                    } else {
+                        button.classList.add('liked');
+                        button.querySelector('i').classList.remove('fa-heart-o');
+                        button.querySelector('i').classList.add('fa-heart');
+                    }
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(error) {
+                console.error('Error toggling like:', error);
+            }
         });
     }
 </script>
