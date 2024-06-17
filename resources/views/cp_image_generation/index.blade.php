@@ -181,7 +181,7 @@
                                     </div>
                                     <div class="card-footer d-flex justify-content-between align-items-center">
                                         <span class="text-gray-500 text-sm">{{ $product->likes->count() }} likes</span>
-                                        <button class="like-button {{ $product->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" onclick="toggleLike({{ $product->id }}, this)">
+                                        <button class="like-button ml-2 {{ $product->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" onclick="toggleLike({{ $product->id }}, this)">
                                             <i class="fa fa-heart{{ $product->likes->contains('user_id', auth()->id()) ? '' : '-o' }}"></i>
                                         </button>
                                     </div>
@@ -194,6 +194,7 @@
         </div>
     </div>
 </div>
+<script src="https://kit.fontawesome.com/21428d3739.js" crossorigin="anonymous"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
