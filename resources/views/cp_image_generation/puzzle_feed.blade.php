@@ -46,14 +46,6 @@
     .card:hover .card-img-top {
         transform: scale(1.05);
     }
-    .card-title {
-        font-size: 18px;
-        font-weight: bold;
-    }
-    .card-description {
-        font-size: 14px;
-        color: #6c757d;
-    }
     .overlay {
         position: absolute;
         bottom: 10px;
@@ -80,7 +72,7 @@
                         <img src="{{ Storage::url($product->cropped_image) }}" class="card-img-top" alt="{{ $product->title }}" style="border-radius: 4px;">
                     </a>
                     <div class="overlay">
-                        <div class="like-count">
+                        <div class="like-count" style="pointer-events: all;">
                             <span id="like-count-{{ $product->id }}">{{ $product->likes->count() }}</span> likes
                         </div>
                         <div class="overlay-content">
@@ -90,8 +82,6 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <a href="{{ $product->product_url }}" target="_blank" class="text-gray-500 text-sm">Open in a new tab <i class="fa fa-external-link"></i></a>
-                        <h5 class="card-title text-dark">{{ $product->title }}</h5>
                     </div>
                 </div>
             </div>
