@@ -33,4 +33,4 @@ mark {
 </style>
 
 <a href="/" class="arvo-bold" style="font-size:33px;color:#b71540;">Concord Puzzle</a><br>
-<center><a href="/" class="arvo-regular-italic" style="font-size:26px;"><mark> Creator </mark></a></center>
+<center><a href="/" class="arvo-regular-italic" style="font-size:26px;"><mark>&nbsp;Creator&nbsp;</mark></a></center>
