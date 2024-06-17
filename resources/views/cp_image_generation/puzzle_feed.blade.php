@@ -88,7 +88,7 @@
 <div class="container text-center my-5">
 
 <div class="flex justify-center"><br>
-                   <div style="color:#079992;font-size:33px;" class="arvo-bold">Creator Made</div></a>
+                   <div style="color:#0c2461;font-size:33px;" class="arvo-bold">Community Made</div></a>
                 </div>   <br> <div class="row">
         @foreach($publishedProducts as $product)
             <div class="col-md-3 mb-4 position-relative">
