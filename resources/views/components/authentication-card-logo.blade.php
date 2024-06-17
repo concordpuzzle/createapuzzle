@@ -26,7 +26,10 @@
   font-weight: 700;
   font-style: italic;
 }
-
+mark {
+  background-color: #079992;;
+  color: #fff;
+}
 </style>
 <a href="/" class="arvo-bold" style="font-size:33px;color:#b71540;">Concord Puzzle</a><br>
-<center><a href="/" class="arvo-regular-italic" style="font-size:22px;color:#079992;">Creator</a></center>
+<center><a href="/" class="mark, arvo-regular-italic" style="font-size:22px;">Creator</a></center>
