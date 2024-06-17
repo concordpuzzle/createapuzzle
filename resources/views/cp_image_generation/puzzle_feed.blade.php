@@ -27,6 +27,7 @@
         font-style: italic;
         font-size: 14px;
         margin-right: 10px;
+        color: #fff;
     }
     .card-footer {
         display: flex;
@@ -61,12 +62,11 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: rgba(0, 0, 0, 0.5);
         padding: 10px;
-        border-radius: 0 0 10px 10px;
+        pointer-events: none;
     }
-    .overlay .like-count {
-        color: #fff;
+    .overlay-content {
+        pointer-events: all;
     }
 </style>
 
@@ -76,18 +76,21 @@
         @foreach($publishedProducts as $product)
             <div class="col-md-3 mb-4 position-relative">
                 <div class="card h-100 shadow-sm">
-                    <a href="{{ $product->product_url }}" class="text-decoration-none position-relative">
+                    <a href="{{ $product->product_url }}" class="text-decoration-none">
                         <img src="{{ Storage::url($product->cropped_image) }}" class="card-img-top" alt="{{ $product->title }}" style="border-radius: 4px;">
-                        <div class="overlay">
-                            <div class="like-count">
-                                <span id="like-count-{{ $product->id }}">{{ $product->likes->count() }}</span> likes
-                            </div>
+                    </a>
+                    <div class="overlay">
+                        <div class="like-count">
+                            <span id="like-count-{{ $product->id }}">{{ $product->likes->count() }}</span> likes
+                        </div>
+                        <div class="overlay-content">
                             <button class="like-button {{ $product->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" onclick="toggleLike({{ $product->id }}, this)">
                                 <i class="fa fa-heart{{ $product->likes->contains('user_id', auth()->id()) ? '' : '-o' }}"></i>
                             </button>
                         </div>
-                    </a>
+                    </div>
                     <div class="card-body">
+                        <a href="{{ $product->product_url }}" target="_blank" class="text-gray-500 text-sm">Open in a new tab <i class="fa fa-external-link"></i></a>
                         <h5 class="card-title text-dark">{{ $product->title }}</h5>
                     </div>
                 </div>
