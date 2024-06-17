@@ -21,12 +21,20 @@ class CPImageGenerationController extends Controller
     public function index()
     {
         $userId = auth()->user()->id;
+        
+        // Fetch user's generated images
         $images = CPImageGeneration::where('user_id', $userId)
             ->orderBy('created_at', 'desc')
             ->get();
-
-        return view('cp_image_generation.index', compact('images'));
+        
+        // Fetch published products sorted by likes
+        $publishedProducts = Product::with('likes')->get()->sortByDesc(function ($product) {
+            return $product->likes->count();
+        });
+    
+        return view('cp_image_generation.index', compact('images', 'publishedProducts'));
     }
+    
 
 
     // app/Http/Controllers/CPImageGenerationController.php
