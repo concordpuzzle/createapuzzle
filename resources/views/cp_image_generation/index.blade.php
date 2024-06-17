@@ -66,6 +66,19 @@
         max-height: 60vh;
         overflow-y: auto;
     }
+    .like-button {
+        background: none;
+        border: none;
+        color: #b71540;
+        font-size: 24px;
+        cursor: pointer;
+    }
+    .like-button.liked {
+        color: #ff0000;
+    }
+    .like-count {
+        font-size: 11px;
+    }
 </style>
 
 <div class="container text-center my-4">
@@ -168,7 +181,7 @@
                                     </div>
                                     <div class="card-footer d-flex justify-content-between align-items-center">
                                         <span class="text-gray-500 text-sm">{{ $product->likes->count() }} likes</span>
-                                        <button class="like-button ml-2 {{ $product->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" onclick="toggleLike({{ $product->id }}, this)">
+                                        <button class="like-button {{ $product->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" onclick="toggleLike({{ $product->id }}, this)">
                                             <i class="fa fa-heart{{ $product->likes->contains('user_id', auth()->id()) ? '' : '-o' }}"></i>
                                         </button>
                                     </div>
@@ -181,7 +194,6 @@
         </div>
     </div>
 </div>
-<script src="https://kit.fontawesome.com/21428d3739.js" crossorigin="anonymous"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
@@ -232,6 +244,45 @@
             $('#loadingModal').modal('hide');
             console.error('Error:', error);
             alert('Upscaling failed: ' + error.message);
+        });
+    }
+
+    function toggleLike(productId, button) {
+        @guest
+            window.location.href = '{{ route("login") }}';
+            return;
+        @endguest
+
+        const isLiked = button.classList.contains('liked');
+        const url = isLiked ? '{{ route("cp_image_generation.unlike") }}' : '{{ route("cp_image_generation.like") }}';
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                product_id: productId
+            },
+            success: function(response) {
+                if (response.success) {
+                    const likeCountElement = button.closest('.card-footer').querySelector('.text-gray-500');
+                    likeCountElement.textContent = response.likes_count + ' likes';
+                    if (isLiked) {
+                        button.classList.remove('liked');
+                        button.querySelector('i').classList.remove('fa-heart');
+                        button.querySelector('i').classList.add('fa-heart-o');
+                    } else {
+                        button.classList.add('liked');
+                        button.querySelector('i').classList.remove('fa-heart-o');
+                        button.querySelector('i').classList.add('fa-heart');
+                    }
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(error) {
+                console.error('Error toggling like:', error);
+            }
         });
     }
 </script>
