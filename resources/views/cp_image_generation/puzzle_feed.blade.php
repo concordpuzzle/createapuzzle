@@ -16,18 +16,18 @@
     .like-button {
         background: none;
         border: none;
-        color: #b71540;
-        font-size: 24px;
+        color: #fff;
+        font-size: 28px;
         cursor: pointer;
     }
     .like-button.liked {
         color: #ff0000;
     }
     .like-count {
-        font-style: italic;
-        font-size: 14px;
+        font-style: bold;
+        font-size: 18px;
         margin-right: 10px;
-        color: #000;
+        color: #fff;
     }
     .card-footer {
         display: flex;
@@ -57,7 +57,7 @@
     }
     .overlay {
         position: absolute;
-        bottom: 20px;
+        bottom: 8px;
         left: 10px;
         right: 10px;
         display: flex;
@@ -79,7 +79,7 @@
                     <a href="{{ $product->product_url }}" class="text-decoration-none">
                         <img src="{{ Storage::url($product->cropped_image) }}" class="card-img-top" alt="{{ $product->title }}" style="border-radius: 4px;">
                     </a>
-                    <div class="overlay" style="bottom: -20px;">
+                    <div class="overlay">
                         <div class="like-count" style="pointer-events: all;">
                             <span id="like-count-{{ $product->id }}">{{ $product->likes->count() }}</span> likes
                         </div>
@@ -88,6 +88,8 @@
                                 <i class="fa fa-heart{{ $product->likes->contains('user_id', auth()->id()) ? '' : '-o' }}"></i>
                             </button>
                         </div>
+                    </div>
+                    <div class="card-body">
                     </div>
                 </div>
             </div>
