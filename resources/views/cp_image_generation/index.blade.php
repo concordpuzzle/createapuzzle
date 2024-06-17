@@ -19,6 +19,10 @@
         font-weight: 700;
         color: #b71540;
     }
+    .arvo {
+        font-family: "Arvo", serif;
+        font-weight: 400;
+    }
     .upscale-button {
         font-size: 12px;
         background-color: #0c2461;
@@ -79,6 +83,18 @@
     .like-count {
         font-size: 11px;
     }
+    .card-img-overlay {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 10px;
+    }
+    .overlay-actions {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
 </style>
 
 <div class="container text-center my-4">
@@ -111,40 +127,16 @@
             @foreach($images as $image)
                 @if($image->image_type == 'original')
                 <div class="col-md-4 d-flex justify-content-center mb-4">
-                    <div class="card shadow-sm">
-                        <img src="{{ Storage::url($image->generated_image) }}" class="card-img-top" alt="{{ $image->prompt }}" style="border-radius: 4px;">
-                        <div class="card-body text-center">
-                            <p class="card-text radio-canada-big">{{ $image->prompt }}</p>
-                            <div class="mt-3">
-                                <div class="row mb-2">
-                                    <div class="col">
-                                        <button class="btn upscale-button radio-canada-big w-100" onclick="upscaleImage(this, '{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U1')">
-                                            <div class="spinner" id="U1Spinner"></div>
-                                            Top Left
-                                        </button>
-                                    </div>
-                                    <div class="col">
-                                        <button class="btn upscale-button radio-canada-big w-100" onclick="upscaleImage(this, '{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U2')">
-                                            <div class="spinner" id="U2Spinner"></div>
-                                            Top Right
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <button class="btn upscale-button radio-canada-big w-100" onclick="upscaleImage(this, '{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U3')">
-                                            <div class="spinner" id="U3Spinner"></div>
-                                            Bottom Left
-                                        </button>
-                                    </div>
-                                    <div class="col">
-                                        <button class="btn upscale-button radio-canada-big w-100" onclick="upscaleImage(this, '{{ $image->id }}', '{{ $image->midjourney_message_id }}', 'U4')">
-                                            <div class="spinner" id="U4Spinner"></div>
-                                            Bottom Right
-                                        </button>
-                                    </div>
-                                </div>
+                    <div class="card shadow-sm position-relative">
+                        <img src="{{ Storage::url($image->generated_image) }}" class="card-img-top" alt="{{ $image->prompt }}" style="border-radius: 10px;">
+                        <div class="card-img-overlay">
+                            <div class="overlay-actions">
+                                <span class="text-gray-500 like-count">{{ $image->likes->count() }} likes</span>
+                                <button class="like-button {{ $image->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" onclick="toggleLike({{ $image->id }}, this)">
+                                    <i class="fa fa-heart{{ $image->likes->contains('user_id', auth()->id()) ? '' : '-o' }}"></i>
+                                </button>
                             </div>
+                            <a href="{{ $image->product_url }}" target="_blank" class="text-gray-500 text-sm mt-auto">Open in a new tab <i class="fa fa-external-link"></i></a>
                         </div>
                     </div>
                 </div>
@@ -159,31 +151,31 @@
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 id="loadingModalLabel" class="arvo-bold">Community Made Puzzles</h5>
+                <h5 id="loadingModalLabel" class="arvo-bold">Community Made</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="text-center">
-                    <h5 id="loadingModalText" class="arvo-bold">Creating Puzzle Pictures.</h5>
+                    <h5 id="loadingModalText" class="arvo">Creating Puzzle Pictures.</h5>
                 </div>
                 <div class="mt-4">
                     <div class="row">
                         @foreach($publishedProducts as $product)
                             <div class="col-md-4 mb-4">
-                                <div class="card shadow-sm h-100">
+                                <div class="card shadow-sm position-relative h-100">
                                     <a href="{{ $product->product_url }}" class="block mb-4">
                                         <img src="{{ Storage::url($product->cropped_image) }}" alt="{{ $product->title }}" class="w-full h-auto rounded-lg" style="border-radius: 10px;">
                                     </a>
-                                    <div class="card-body text-center">
-                                        <a href="{{ $product->product_url }}" target="_blank" class="text-gray-500 text-sm">Open in a new tab <i class="fa fa-external-link"></i></a>
-                                    </div>
-                                    <div class="card-footer d-flex justify-content-between align-items-center">
-                                        <span class="text-gray-500 text-sm">{{ $product->likes->count() }} likes</span>
-                                        <button class="like-button ml-2 {{ $product->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" onclick="toggleLike({{ $product->id }}, this)">
-                                            <i class="fa fa-heart{{ $product->likes->contains('user_id', auth()->id()) ? '' : '-o' }}"></i>
-                                        </button>
+                                    <div class="card-img-overlay">
+                                        <div class="overlay-actions">
+                                            <span class="text-gray-500 like-count">{{ $product->likes->count() }} likes</span>
+                                            <button class="like-button {{ $product->likes->contains('user_id', auth()->id()) ? 'liked' : '' }}" onclick="toggleLike({{ $product->id }}, this)">
+                                                <i class="fa fa-heart{{ $product->likes->contains('user_id', auth()->id()) ? '' : '-o' }}"></i>
+                                            </button>
+                                        </div>
+                                        <a href="{{ $product->product_url }}" target="_blank" class="text-gray-500 text-sm mt-auto">Open in a new tab <i class="fa fa-external-link"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -266,7 +258,7 @@
             },
             success: function(response) {
                 if (response.success) {
-                    const likeCountElement = button.closest('.card-footer').querySelector('.text-gray-500');
+                    const likeCountElement = button.closest('.card-img-overlay').querySelector('.like-count');
                     likeCountElement.textContent = response.likes_count + ' likes';
                     if (isLiked) {
                         button.classList.remove('liked');
