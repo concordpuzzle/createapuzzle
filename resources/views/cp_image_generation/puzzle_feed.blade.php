@@ -24,7 +24,7 @@
         color: #ff0000;
     }
     .like-count {
-        font-style: bold;
+        font-weight: bold;
         font-size: 18px;
         margin-right: 10px;
         color: #fff;
@@ -68,6 +68,21 @@
     .overlay-content {
         pointer-events: all;
     }
+    .make-puzzle-button {
+        background-color: #079992;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 18px;
+        border-radius: 5px;
+        text-decoration: none;
+        margin-top: 20px;
+    }
+    .make-puzzle-button:hover {
+        background-color: #067a6e;
+        color: #fff;
+        text-decoration: none;
+    }
 </style>
 
 <div class="container text-center my-5">
@@ -95,6 +110,7 @@
             </div>
         @endforeach
     </div>
+    <a href="{{ url('/dashboard') }}" class="make-puzzle-button">Make a Puzzle</a>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
