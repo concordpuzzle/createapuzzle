@@ -82,14 +82,14 @@
 
             <div class="max-w-7xl mx-auto p-6 lg:p-8">
                 <div class="flex justify-center">
-                     <div style="color:#b71540;font-size:44px;" class="arvo-bold">Make a Puzzle</div>
+                     <div style="color:#0c2461;font-size:44px;" class="arvo-bold">Make a Puzzle</div>
                 </div>
 
                 <div class="mt-16">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                     <a href="https://make.concordpuzzle.com/dashboard" class="scale-100 p-6 bg-white rounded-lg shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
     <div>
-        <div style="background-color:#0c2461" class="h-16 w-16 flex items-center justify-center rounded-full">
+        <div style="background-color:#079992" class="h-16 w-16 flex items-center justify-center rounded-full">
             <i class="fa-solid fa-magic" style="color:#fff;font-size:22px;"></i>
         </div>
         <h2 class="mt-6 text-xl font-semibold text-gray-900">Make a Puzzle with <u>Generative AI</u></h2>
@@ -104,7 +104,7 @@
 
 <a href="https://make.concordpuzzle.com/puzzle-feed" class="scale-100 p-6 bg-white rounded-lg shadow-none shadow-gray-500/20 flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
     <div>
-        <div style="background-color:#b71540" class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full">
+        <div style="background-color:#0c2461" class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full">
             <i class="fa-solid fa-users" style="color:#fff;font-size:22px;"></i>
         </div>
         <h2 class="mt-6 text-xl font-semibold text-gray-900">Browse <u>Community Made</u> Puzzles</h2>
