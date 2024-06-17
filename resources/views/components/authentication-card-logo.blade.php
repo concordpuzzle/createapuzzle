@@ -28,5 +28,5 @@
 }
 
 </style>
-<a href="/" class="arvo-bold" style="font-size:33px;color:#0c2461;">Concord Puzzle</a><br>
+<a href="/" class="arvo-bold" style="font-size:33px;color:#b71540;">Concord Puzzle</a><br>
 <center><a href="/" class="arvo-regular-italic" style="font-size:22px;color:#079992;">Creator</a></center>
