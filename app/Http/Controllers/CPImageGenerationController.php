@@ -28,10 +28,10 @@ class CPImageGenerationController extends Controller
             ->get();
         
         // Fetch published products sorted by likes
-        $publishedProducts = Product::with('likes')->get()->sortByDesc(function ($product) {
+        $publishedProducts = PublishedProduct::with('likes')->get()->sortByDesc(function ($product) {
             return $product->likes->count();
         });
-    
+
         return view('cp_image_generation.index', compact('images', 'publishedProducts'));
     }
     
