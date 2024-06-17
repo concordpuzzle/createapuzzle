@@ -86,8 +86,10 @@
 </style>
 
 <div class="container text-center my-5">
-    <h1 class="display-4 mb-4 radio-canada-big" style="font-size:22px!important;">Community Made Puzzles</h1>
-    <div class="row">
+
+<div class="flex justify-center"><br>
+                    <a href="https://make.concordpuzzle.com"> <div style="color:#b71540;font-size:33px;" class="arvo-bold">Community Made</div></a>
+                </div>    <div class="row">
         @foreach($publishedProducts as $product)
             <div class="col-md-3 mb-4 position-relative">
                 <div class="card h-100 shadow-sm">

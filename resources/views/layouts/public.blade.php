@@ -65,9 +65,6 @@
     </head>
     <body>
 
-            <div class="flex justify-center"><br>
-                    <a href="https://make.concordpuzzle.com"> <div style="color:#b71540;font-size:33px;" class="arvo-bold">Make a Puzzle</div></a>
-                </div>
         <div class="font-sans text-gray-900 antialiased">
             
         @yield('content')
