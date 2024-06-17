@@ -46,16 +46,25 @@
     .card:hover .card-img-top {
         transform: scale(1.05);
     }
+    .card-title {
+        font-size: 18px;
+        font-weight: bold;
+    }
+    .card-description {
+        font-size: 14px;
+        color: #6c757d;
+    }
     .overlay {
         position: absolute;
-        bottom: 10px;
-        left: 10px;
-        right: 10px;
+        bottom: 0;
+        left: 0;
+        right: 0;
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 10px;
         pointer-events: none;
+        background-color: rgba(0, 0, 0, 0.5); /* This ensures the text is visible on any image */
     }
     .overlay-content {
         pointer-events: all;
