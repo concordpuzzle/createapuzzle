@@ -52,7 +52,6 @@
 
         <!-- Styles -->
         @livewireStyles
-        @livewire('navigation-menu')
 
 <!-- Page Heading -->
 @if (isset($header))
