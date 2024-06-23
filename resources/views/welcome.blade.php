@@ -89,10 +89,10 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                     <a href="https://make.concordpuzzle.com/dashboard" class="scale-100 p-6 bg-white rounded-lg shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
     <div>
-        <div style="background-color:#079992" class="h-16 w-16 flex items-center justify-center rounded-full">
-            <i class="fa-solid fa-magic" style="color:#fff;font-size:22px;"></i>
+        <div style="background-color:#0c2461" class="h-16 w-16 flex items-center justify-center rounded-full">
+            <i style="color:#fff;font-size:22px;">⭐</i>
         </div>
-        <h2 class="mt-6 text-xl font-semibold text-gray-900">Make a Puzzle with <u>Generative AI</u></h2>
+        <h2 class="mt-6 text-xl font-semibold text-gray-900">Make a Puzzle with <u>AI</u></h2>
         <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
             Generate a custom puzzle using AI. Simply provide a prompt and let the AI create a unique image for your puzzle.
         </p>
