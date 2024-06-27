@@ -3,6 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CPImageGenerationController;
 use App\Http\Controllers\ImageGenerationController;
+use App\Http\Controllers\StripeController;
+
+Route::get('/payment', [StripeController::class, 'showPaymentForm'])->name('stripe.form');
+Route::post('/payment', [StripeController::class, 'processPayment'])->name('stripe.process');
 
 /*
 |--------------------------------------------------------------------------
