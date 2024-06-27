@@ -1,8 +1,7 @@
+<!-- resources/views/payment.blade.php -->
 @extends('layouts.app')
 
 @section('content')
-<script src="https://js.stripe.com/v3/"></script>
-
 <div class="container">
     <h2>Complete Payment</h2>
     @if ($errors->any())
@@ -29,6 +28,7 @@
         <button class="btn btn-primary mt-3">Submit Payment</button>
     </form>
 </div>
+<script src="https://js.stripe.com/v3/"></script>
 
 <script>
     var stripe = Stripe('{{ env('STRIPE_KEY') }}');
